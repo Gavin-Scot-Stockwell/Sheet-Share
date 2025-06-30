@@ -36,9 +36,9 @@ const ThoughtList: React.FC<ThoughtListProps> = ({ thoughts, title }) => {
             {/* Create a link to this thought's page to view its comments using `<Link>` component */}
             <Link
               className="btn btn-primary btn-block btn-squared"
-              to={`/thoughts/${thought._id}`}
+              to={`/edit5e/${thought._id}`}
             >
-              Join the discussion on this thought.
+             Edit and Play
             </Link>
           </div>
         ))}

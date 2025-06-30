@@ -58,3 +58,24 @@ export const QUERY_ME = gql`
     }
   }
 `;
+
+export const GET_PUBLISH = gql`
+query Publish($publishId: ID!) {
+  publish(publishId: $publishId) {
+    PublishText
+    _id
+    originalThoughtId
+  }
+}
+`;
+
+export const GET_PUBLISHES = gql`
+query getPublishes {
+  publishes {
+    PublishText
+    PublishAuthor
+    originalThoughtId
+    _id
+  }
+}
+`;

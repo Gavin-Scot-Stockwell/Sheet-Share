@@ -54,3 +54,26 @@ export const ADD_COMMENT = gql`
     }
   }
 `;
+
+
+
+
+export const ADD_PUBLISH = gql`
+mutation PublishCreate($thoughtId: ID!) {
+  publishThought(thoughtId: $thoughtId) {
+    PublishText
+    _id
+    originalThoughtId
+  }
+}
+`;
+
+
+export const UPDATE_THOUGHT = gql`
+mutation updateThought($thoughtId: ID!, $input: UpdateThoughtInput!) {
+  updateThought(thoughtId: $thoughtId, input: $input) {
+    _id
+    thoughtText
+  }
+}
+`;

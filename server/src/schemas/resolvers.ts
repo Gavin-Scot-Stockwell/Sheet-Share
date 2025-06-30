@@ -54,6 +54,14 @@ interface UpdateThoughtArgs {
   }
 }
 
+interface PublishArgs {
+  publishId: string;
+}
+
+interface RemovePublishArgs {
+  publishId: string;
+}
+
 const resolvers = {
   Query: {
     users: async () => {
@@ -68,8 +76,8 @@ const resolvers = {
     thought: async (_parent: any, { thoughtId }: ThoughtArgs) => {
       return await Thought.findOne({ _id: thoughtId });
     },
-    publish: async (_parent: any, { thoughtId }: ThoughtArgs) => {
-      return await Publish.findOne({ _id: thoughtId });
+    publish: async (_parent: any, { publishId }: PublishArgs) => {
+      return await Publish.findOne({ _id: publishId });
     },
     publishes: async () => {
       return await Publish.find().sort({ createdAt: -1 });
@@ -132,8 +140,7 @@ const resolvers = {
 
         return thought;
       }
-      throw AuthenticationError;
-      ('You need to be logged in!');
+      throw new AuthenticationError('You need to be logged in!');
     },
     addComment: async (_parent: any, { thoughtId, commentText }: AddCommentArgs, context: any) => {
       if (context.user) {
@@ -150,8 +157,9 @@ const resolvers = {
           }
         );
       }
-      throw AuthenticationError;
+      throw new AuthenticationError('You need to be logged in!');
     },
+
     removeThought: async (_parent: any, { thoughtId }: ThoughtArgs, context: any) => {
       if (context.user) {
         const thought = await Thought.findOneAndDelete({
@@ -160,7 +168,7 @@ const resolvers = {
         });
 
         if (!thought) {
-          throw AuthenticationError;
+          throw new AuthenticationError('Thought not found or not authorized');
         }
 
         await User.findOneAndUpdate(
@@ -170,8 +178,9 @@ const resolvers = {
 
         return thought;
       }
-      throw AuthenticationError;
+      throw new AuthenticationError('You need to be logged in!');
     },
+
     removeComment: async (_parent: any, { thoughtId, commentId }: RemoveCommentArgs, context: any) => {
       if (context.user) {
         return Thought.findOneAndUpdate(
@@ -187,8 +196,24 @@ const resolvers = {
           { new: true }
         );
       }
-      throw AuthenticationError;
+      throw new AuthenticationError('You need to be logged in!');
     },
+
+    removePublish: async (_parent: any, { publishId }: RemovePublishArgs, context: any) => {
+      if (context.user) {
+        const publish = await Publish.findOneAndDelete({
+          _id: publishId,
+          PublishAuthor: context.user.username,
+        });
+
+        if (!publish) {
+          throw new AuthenticationError('Publish not found or not authorized');
+        }
+        return publish;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
     updateThought: async (_parent: any, { thoughtId, input }: UpdateThoughtArgs, context: any) => {
       if (context.user) {
         const thought = await Thought.findOneAndUpdate(
@@ -201,16 +226,17 @@ const resolvers = {
         );
 
         if (!thought) {
-          throw AuthenticationError;
+          throw new AuthenticationError('Thought not found or not authorized');
         }
 
         return thought;
       }
-      throw AuthenticationError;
-    },//just to call, the logic is inside the 
+      throw new AuthenticationError('You need to be logged in!');
+    },
+    //the resolver stuff in model
     publishThought: async (_parent: any, { thoughtId }: ThoughtArgs, context: any) => {
       if (!context.user) {
-        throw AuthenticationError;
+        throw new AuthenticationError('You need to be logged in!');
       }
 
       return await Publish.createFromThought(thoughtId);

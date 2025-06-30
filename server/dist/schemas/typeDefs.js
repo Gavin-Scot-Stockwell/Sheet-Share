@@ -60,13 +60,14 @@ const typeDefs = `
     me: User
   }
 
-  type Mutation {
+ type Mutation {
     addUser(input: UserInput!): Auth
     login(email: String!, password: String!): Auth
     addThought(input: ThoughtInput!): Thought
     addComment(thoughtId: ID!, commentText: String!): Thought
     removeThought(thoughtId: ID!): Thought
     removeComment(thoughtId: ID!, commentId: ID!): Thought
+    removePublish(publishId: ID!): Publish
     updateThought(thoughtId: ID!, input: UpdateThoughtInput!): Thought
     publishThought(thoughtId: ID!): Publish
   }
