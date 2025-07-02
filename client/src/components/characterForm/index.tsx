@@ -2,21 +2,21 @@ import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 
-import { ADD_THOUGHT } from '../../utils/mutations';
-import { QUERY_THOUGHTS, QUERY_ME } from '../../utils/queries';
+import { ADD_CHARACTER } from '../../utils/mutations';
+import { QUERY_CHARACTERS, QUERY_ME } from '../../utils/queries';
 
 import Auth from '../../utils/auth';
 
-const ThoughtForm = () => {
-  const [thoughtText, setThoughtText] = useState('');
+const CharacterForm = () => {
+  const [characterData, setCharacterData] = useState('');
 
   const [characterCount, setCharacterCount] = useState(0);
 
-  const [addThought, { error }] = useMutation
-  (ADD_THOUGHT, {
+  const [addCharacter, { error }] = useMutation
+  (ADD_CHARACTER, {
     refetchQueries: [
-      QUERY_THOUGHTS,
-      'getThoughts',
+      QUERY_CHARACTERS,
+      'getCharacters',
       QUERY_ME,
       'me'
     ]
@@ -26,14 +26,14 @@ const ThoughtForm = () => {
     event.preventDefault();
 
     try {
-      await addThought({
+      await addCharacter({
         variables: { input:{
-          thoughtText,
-          thoughtAuthor: Auth.getProfile().data.username,
+          characterData,
+          characterCreator: Auth.getProfile().data.username,
         }},
       });
 
-      setThoughtText('');
+      setCharacterData('');
     } catch (err) {
       console.error(err);
     }
@@ -42,15 +42,15 @@ const ThoughtForm = () => {
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = event.target;
 
-    if (name === 'thoughtText' && value.length <= 280) {
-      setThoughtText(value);
+    if (name === 'characterData' && value.length <= 280) {
+      setCharacterData(value);
       setCharacterCount(value.length);
     }
   };
 
   return (
     <div>
-      <h3>What's on your techy mind?</h3>
+      <h3>Create Your D&D 5e Character</h3>
 
       {Auth.loggedIn() ? (
         <>
@@ -67,9 +67,9 @@ const ThoughtForm = () => {
           >
             <div className="col-12 col-lg-9">
               <textarea
-                name="thoughtText"
-                placeholder="Here's a new thought..."
-                value={thoughtText}
+                name="characterData"
+                placeholder="Describe your character..."
+                value={characterData}
                 className="form-input w-100"
                 style={{ lineHeight: '1.5', resize: 'vertical' }}
                 onChange={handleChange}
@@ -78,7 +78,7 @@ const ThoughtForm = () => {
 
             <div className="col-12 col-lg-3">
               <button className="btn btn-primary btn-block py-3" type="submit">
-                Add Thought
+                Create Character
               </button>
             </div>
             {error && (
@@ -90,7 +90,7 @@ const ThoughtForm = () => {
         </>
       ) : (
         <p>
-          You need to be logged in to share your thoughts. Please{' '}
+          You need to be logged in to create characters. Please{' '}
           <Link to="/login">login</Link> or <Link to="/signup">signup.</Link>
         </p>
       )}
@@ -98,4 +98,4 @@ const ThoughtForm = () => {
   );
 };
 
-export default ThoughtForm;
+export default CharacterForm;

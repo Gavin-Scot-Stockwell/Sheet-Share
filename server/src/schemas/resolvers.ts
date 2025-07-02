@@ -1,11 +1,5 @@
-import { Thought, User, Publish } from '../models/index.js';
+import { Character, User, Publish } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
-//update thought
-//add publish
-//publish allows others to see it
-//when the publish/share button is pressed
-//for the first time it will save a new document
-//during the second time being pressed it will update that same public document
 
 // Define types for the arguments
 interface AddUserArgs {
@@ -25,32 +19,31 @@ interface UserArgs {
   username: string;
 }
 
-interface ThoughtArgs {
-  thoughtId: string;
+interface CharacterArgs {
+  characterId: string;
 }
 
-interface AddThoughtArgs {
+interface AddCharacterArgs {
   input: {
-    thoughtText: string;
-    thoughtAuthor: string;
+    characterData: string;
+    characterCreator: string;
   }
 }
 
 interface AddCommentArgs {
-  thoughtId: string;
+  characterId: string;
   commentText: string;
 }
 
 interface RemoveCommentArgs {
-  thoughtId: string;
+  characterId: string;
   commentId: string;
 }
 
-interface UpdateThoughtArgs {
-  thoughtId: string;
-
+interface UpdateCharacterArgs {
+  characterId: string;
   input: {
-    thoughtText: string;
+    characterData: string;
   }
 }
 
@@ -65,16 +58,16 @@ interface RemovePublishArgs {
 const resolvers = {
   Query: {
     users: async () => {
-      return User.find().populate('thoughts');
+      return User.find().populate('characters');
     },
     user: async (_parent: any, { username }: UserArgs) => {
-      return User.findOne({ username }).populate('thoughts');
+      return User.findOne({ username }).populate('characters');
     },
-    thoughts: async () => {
-      return await Thought.find().sort({ createdAt: -1 });
+    characters: async () => {
+      return await Character.find().sort({ createdAt: -1 });
     },
-    thought: async (_parent: any, { thoughtId }: ThoughtArgs) => {
-      return await Thought.findOne({ _id: thoughtId });
+    character: async (_parent: any, { characterId }: CharacterArgs) => {
+      return await Character.findOne({ _id: characterId });
     },
     publish: async (_parent: any, { publishId }: PublishArgs) => {
       return await Publish.findOne({ _id: publishId });
@@ -83,69 +76,55 @@ const resolvers = {
       return await Publish.find().sort({ createdAt: -1 });
     },
 
-    // Query to get the authenticated user's information
-    // The 'me' query relies on the context to check if the user is authenticated
     me: async (_parent: any, _args: any, context: any) => {
-      // If the user is authenticated, find and return the user's information along with their thoughts
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate('thoughts');
+        return User.findOne({ _id: context.user._id }).populate('characters');
       }
-      // If the user is not authenticated, throw an AuthenticationError
       throw new AuthenticationError('Could not authenticate user.');
     },
   },
   Mutation: {
     addUser: async (_parent: any, { input }: AddUserArgs) => {
-      // Create a new user with the provided username, email, and password
       const user = await User.create({ ...input });
-
-      // Sign a token with the user's information
       const token = signToken(user.username, user.email, user._id);
-
-      // Return the token and the user
       return { token, user };
     },
 
     login: async (_parent: any, { email, password }: LoginUserArgs) => {
-      // Find a user with the provided email
       const user = await User.findOne({ email });
 
-      // If no user is found, throw an AuthenticationError
       if (!user) {
         throw new AuthenticationError('Could not authenticate user.');
       }
 
-      // Check if the provided password is correct
       const correctPw = await user.isCorrectPassword(password);
 
-      // If the password is incorrect, throw an AuthenticationError
       if (!correctPw) {
         throw new AuthenticationError('Could not authenticate user.');
       }
 
-      // Sign a token with the user's information
       const token = signToken(user.username, user.email, user._id);
-
-      // Return the token and the user
       return { token, user };
     },
-    addThought: async (_parent: any, { input }: AddThoughtArgs, context: any) => {
+
+    addCharacter: async (_parent: any, { input }: AddCharacterArgs, context: any) => {
       if (context.user) {
-        const thought = await Thought.create({ ...input });
+        const character = await Character.create({ ...input });
 
         await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { thoughts: thought._id } }
+          { $addToSet: { characters: character._id } }
         );
 
-        return thought;
+        return character;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
-    addComment: async (_parent: any, { thoughtId, commentText }: AddCommentArgs, context: any) => {
+
+    addComment: async (_parent: any, { characterId, commentText }: AddCommentArgs, context: any) => {
       if (context.user) {
-        return Thought.findOneAndUpdate(
-          { _id: thoughtId },
+        return Character.findOneAndUpdate(
+          { _id: characterId },
           {
             $addToSet: {
               comments: { commentText, commentAuthor: context.user.username },
@@ -160,31 +139,31 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    removeThought: async (_parent: any, { thoughtId }: ThoughtArgs, context: any) => {
+    removeCharacter: async (_parent: any, { characterId }: CharacterArgs, context: any) => {
       if (context.user) {
-        const thought = await Thought.findOneAndDelete({
-          _id: thoughtId,
-          thoughtAuthor: context.user.username,
+        const character = await Character.findOneAndDelete({
+          _id: characterId,
+          characterCreator: context.user.username,
         });
 
-        if (!thought) {
-          throw new AuthenticationError('Thought not found or not authorized');
+        if (!character) {
+          throw new AuthenticationError('Character not found or not authorized');
         }
 
         await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { thoughts: thought._id } }
+          { $pull: { characters: character._id } }
         );
 
-        return thought;
+        return character;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    removeComment: async (_parent: any, { thoughtId, commentId }: RemoveCommentArgs, context: any) => {
+    removeComment: async (_parent: any, { characterId, commentId }: RemoveCommentArgs, context: any) => {
       if (context.user) {
-        return Thought.findOneAndUpdate(
-          { _id: thoughtId },
+        return Character.findOneAndUpdate(
+          { _id: characterId },
           {
             $pull: {
               comments: {
@@ -214,33 +193,34 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    updateThought: async (_parent: any, { thoughtId, input }: UpdateThoughtArgs, context: any) => {
+    updateCharacter: async (_parent: any, { characterId, input }: UpdateCharacterArgs, context: any) => {
       if (context.user) {
-        const thought = await Thought.findOneAndUpdate(
+        const character = await Character.findOneAndUpdate(
           {
-            _id: thoughtId,
-            thoughtAuthor: context.user.username,
+            _id: characterId,
+            characterCreator: context.user.username,
           },
           { ...input },
           { new: true, runValidators: true }
         );
 
-        if (!thought) {
-          throw new AuthenticationError('Thought not found or not authorized');
+        if (!character) {
+          throw new AuthenticationError('Character not found or not authorized');
         }
 
-        return thought;
+        return character;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
-    //the resolver stuff in model
-    publishThought: async (_parent: any, { thoughtId }: ThoughtArgs, context: any) => {
+
+    publishCharacter: async (_parent: any, { characterId }: CharacterArgs, context: any) => {
       if (!context.user) {
         throw new AuthenticationError('You need to be logged in!');
       }
 
-      return await Publish.createFromThought(thoughtId);
+      return await Publish.createFromCharacter(characterId);
     },
   },
 };
+
 export default resolvers;

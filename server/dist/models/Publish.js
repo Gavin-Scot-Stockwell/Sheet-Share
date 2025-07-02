@@ -29,33 +29,33 @@ const PublishSchema = new Schema({
             },
         },
     ],
-    originalThoughtId: {
+    originalCharacterId: {
         type: Schema.Types.ObjectId,
-        ref: 'Thought',
+        ref: 'Character',
         required: false,
     },
 });
 //create and update Publish
-PublishSchema.statics.createFromThought = async function (thoughtId) {
-    const Thought = model("Thought");
-    const thought = await Thought.findById(thoughtId);
-    if (!thought) {
-        throw new Error('Error! There is no thought that matches what ya looking for...');
+PublishSchema.statics.createFromCharacter = async function (characterId) {
+    const Character = model("Character");
+    const character = await Character.findById(characterId);
+    if (!character) {
+        throw new Error('Error! There is no character that matches what ya looking for...');
     }
     //check if already published
-    const existingPublish = await this.findOne({ originalThoughtId: thoughtId });
+    const existingPublish = await this.findOne({ originalCharacterId: characterId });
     if (existingPublish) {
-        return this.findOneAndUpdate({ originalThoughtId: thoughtId }, {
-            PublishText: thought.thoughtText,
-            PublishAuthor: thought.thoughtAuthor,
-            originalThoughtId: thought._id,
+        return this.findOneAndUpdate({ originalCharacterId: characterId }, {
+            PublishText: character.characterData,
+            PublishAuthor: character.characterCreator,
+            originalCharacterId: character._id,
         }, { new: true });
     }
     else { //if doesn't exist, it will create a new one!
         return this.create({
-            PublishText: thought.thoughtText,
-            PublishAuthor: thought.thoughtAuthor,
-            originalThoughtId: thought._id,
+            PublishText: character.characterData,
+            PublishAuthor: character.characterCreator,
+            originalCharacterId: character._id,
             comments: []
         });
     }

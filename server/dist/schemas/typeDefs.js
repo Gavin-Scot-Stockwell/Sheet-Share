@@ -4,13 +4,13 @@ const typeDefs = `
     username: String
     email: String
     password: String
-    thoughts: [Thought]!
+    characters: [Character]!
   }
 
-  type Thought {
+  type Character {
     _id: ID
-    thoughtText: String
-    thoughtAuthor: String
+    characterData: String
+    characterCreator: String
     createdAt: String
     comments: [Comment]!
   }
@@ -21,7 +21,7 @@ const typeDefs = `
   PublishAuthor: String
   createdAt: String
   comments: [Comment]!
-  originalThoughtId: ID
+  originalCharacterId: ID
   }
 
   type Comment {
@@ -30,9 +30,9 @@ const typeDefs = `
     createdAt: String
   }
 
-  input ThoughtInput {
-    thoughtText: String!
-    thoughtAuthor: String!
+  input CharacterInput {
+    characterData: String!
+    characterCreator: String!
   }
 
   input UserInput {
@@ -41,8 +41,8 @@ const typeDefs = `
     password: String!
   }
   
-  input UpdateThoughtInput {
-    thoughtText: String!
+  input UpdateCharacterInput {
+    characterData: String!
   }
 
   type Auth {
@@ -53,8 +53,8 @@ const typeDefs = `
   type Query {
     users: [User]
     user(username: String!): User
-    thoughts: [Thought]!
-    thought(thoughtId: ID!): Thought
+    characters: [Character]!
+    character(characterId: ID!): Character
     publishes: [Publish]!
     publish(publishId: ID!): Publish
     me: User
@@ -63,13 +63,13 @@ const typeDefs = `
  type Mutation {
     addUser(input: UserInput!): Auth
     login(email: String!, password: String!): Auth
-    addThought(input: ThoughtInput!): Thought
-    addComment(thoughtId: ID!, commentText: String!): Thought
-    removeThought(thoughtId: ID!): Thought
-    removeComment(thoughtId: ID!, commentId: ID!): Thought
+    addCharacter(input: CharacterInput!): Character
+    addComment(characterId: ID!, commentText: String!): Character
+    removeCharacter(characterId: ID!): Character
+    removeComment(characterId: ID!, commentId: ID!): Character
     removePublish(publishId: ID!): Publish
-    updateThought(thoughtId: ID!, input: UpdateThoughtInput!): Thought
-    publishThought(thoughtId: ID!): Publish
+    updateCharacter(characterId: ID!, input: UpdateCharacterInput!): Character
+    publishCharacter(characterId: ID!): Publish
   }
 `;
 export default typeDefs;

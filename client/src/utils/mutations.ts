@@ -24,12 +24,12 @@ export const ADD_USER = gql`
 }
 `;
 
-export const ADD_THOUGHT = gql`
-  mutation AddThought($input: ThoughtInput!) {
-    addThought(input: $input) {
+export const ADD_CHARACTER = gql`
+  mutation AddCharacter($input: CharacterInput!) {
+    addCharacter(input: $input) {
       _id
-      thoughtText
-      thoughtAuthor
+      characterData
+      characterCreator
       createdAt
       comments {
         _id
@@ -40,11 +40,11 @@ export const ADD_THOUGHT = gql`
 `;
 
 export const ADD_COMMENT = gql`
-  mutation addComment($thoughtId: ID!, $commentText: String!) {
-    addComment(thoughtId: $thoughtId, commentText: $commentText) {
+  mutation addComment($characterId: ID!, $commentText: String!) {
+    addComment(characterId: $characterId, commentText: $commentText) {
       _id
-      thoughtText
-      thoughtAuthor
+      characterData
+      characterCreator
       createdAt
       comments {
         _id
@@ -55,25 +55,29 @@ export const ADD_COMMENT = gql`
   }
 `;
 
-
-
-
 export const ADD_PUBLISH = gql`
-mutation PublishCreate($thoughtId: ID!) {
-  publishThought(thoughtId: $thoughtId) {
+mutation PublishCreate($characterId: ID!) {
+  publishCharacter(characterId: $characterId) {
     PublishText
     _id
-    originalThoughtId
+    originalCharacterId
   }
 }
 `;
 
-
-export const UPDATE_THOUGHT = gql`
-mutation updateThought($thoughtId: ID!, $input: UpdateThoughtInput!) {
-  updateThought(thoughtId: $thoughtId, input: $input) {
+export const UPDATE_CHARACTER = gql`
+mutation updateCharacter($characterId: ID!, $input: UpdateCharacterInput!) {
+  updateCharacter(characterId: $characterId, input: $input) {
     _id
-    thoughtText
+    characterData
+  }
+}
+`;
+
+export const REMOVE_CHARACTER = gql`
+mutation RemoveCharacter($characterId: ID!) {
+  removeCharacter(characterId: $characterId) {
+    _id
   }
 }
 `;

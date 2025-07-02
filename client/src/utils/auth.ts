@@ -1,11 +1,11 @@
 import { type JwtPayload, jwtDecode } from 'jwt-decode';
 
-// Extending the JwtPayload interface to include additional data fields specific to the application.
+// Extending the JwtPayload interface to include additional data fields specific to Sheet Share.
 interface ExtendedJwt extends JwtPayload {
-  data:{
-    username:string,
-    email:string,
-    id:string
+  data: {
+    username: string,
+    email: string,
+    _id: string
   }
 };
 
@@ -46,13 +46,13 @@ class AuthService {
     return loggedUser;
   }
 
-  // This method logs in the user by storing the token in localStorage and redirecting to the home page.
+  // This method logs in the user by storing the token in localStorage and redirecting to Sheet Share home.
   login(idToken: string) {
     localStorage.setItem('id_token', idToken);
     window.location.assign('/');
   }
 
-  // This method logs out the user by removing the token from localStorage and redirecting to the home page.
+  // This method logs out the user by removing the token from localStorage and redirecting to Sheet Share home.
   logout() {
     localStorage.removeItem('id_token');
     window.location.assign('/');

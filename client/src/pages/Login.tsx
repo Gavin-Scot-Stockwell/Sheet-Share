@@ -41,12 +41,12 @@ const Login = () => {
     <main className="flex-row justify-center mb-4">
       <div className="col-12 col-lg-10">
         <div className="card">
-          <h4 className="card-header bg-dark text-light p-2">Login</h4>
+          <h4 className="card-header bg-dark text-light p-2">Login to Sheet Share</h4>
           <div className="card-body">
             {data ? (
               <p>
                 Success! You may now head{' '}
-                <Link to="/">back to the homepage.</Link>
+                <Link to="/">back to your character collection.</Link>
               </p>
             ) : (
               <form onSubmit={handleFormSubmit}>
@@ -71,7 +71,7 @@ const Login = () => {
                   style={{ cursor: 'pointer' }}
                   type="submit"
                 >
-                  Submit
+                  Login and Start Creating
                 </button>
               </form>
             )}

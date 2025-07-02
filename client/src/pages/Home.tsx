@@ -1,13 +1,19 @@
 const Home = () => {
 
-
   return (
     <main>
-    <div>
-
-    </div>
-    <h1>Welcome to the Site</h1>
-    <p>There is a lot of work to do.. So lets get started!</p>
+      <div className="flex-row justify-center">
+        <div className="col-12 col-md-10 mb-3 p-3" style={{ border: '1px dotted #1a1a1a' }}>
+          <h1>Welcome to Sheet Share</h1>
+          <p>Create and Share TTRPG Characters for those Table Top affairs!</p>
+          <p>Build characters for D&D 5e, Call of Cthulhu 7e, and more systems coming soon.</p>
+        </div>
+      </div>
+      
+      <div className="flex-row justify-center">
+        <div className="col-12 col-md-8">
+        </div>
+      </div>
     </main>
   );
 };

@@ -12,9 +12,12 @@ export default function ErrorPage() {
   return (
     <div id="error-page">
       <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
+      <p>Sorry, an unexpected error has occurred while loading your character sheets.</p>
       <p>
         <i>{error.statusText || error.message}</i>
+      </p>
+      <p>
+        <a href="/">Return to Sheet Share home</a>
       </p>
     </div>
   );

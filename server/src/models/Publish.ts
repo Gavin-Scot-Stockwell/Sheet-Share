@@ -16,7 +16,7 @@ interface IPublish extends Document {
     PublishAuthor: string;
     createdAt: Date;
     comments: IComment[];
-    originalThoughtId?: Schema.Types.ObjectId;
+    originalCharacterId?: Schema.Types.ObjectId;
 }
 
 //Publish Schema for document
@@ -49,49 +49,46 @@ const PublishSchema = new Schema<IPublish>({
             },
         },
     ],
-    originalThoughtId: {
+    originalCharacterId: {
         type: Schema.Types.ObjectId,
-        ref: 'Thought',
+        ref: 'Character',
         required: false,
     },
 });
 
 //create and update Publish
-PublishSchema.statics.createFromThought = async function (thoughtId: string) {
-    const Thought = model("Thought");
-    const thought = await Thought.findById(thoughtId);
+PublishSchema.statics.createFromCharacter = async function (characterId: string) {
+    const Character = model("Character");
+    const character = await Character.findById(characterId);
 
-    if (!thought) {
-        throw new Error('Error! There is no thought that matches what ya looking for...');
+    if (!character) {
+        throw new Error('Error! There is no character that matches what ya looking for...');
     }
 
     //check if already published
-    const existingPublish = await this.findOne({ originalThoughtId: thoughtId });
+    const existingPublish = await this.findOne({ originalCharacterId: characterId });
 
     if (existingPublish) {
         return this.findOneAndUpdate(
-            { originalThoughtId: thoughtId }, {
-
-            PublishText: thought.thoughtText,
-            PublishAuthor: thought.thoughtAuthor,
-            originalThoughtId: thought._id,
-
+            { originalCharacterId: characterId }, {
+            PublishText: character.characterData,
+            PublishAuthor: character.characterCreator,
+            originalCharacterId: character._id,
         },
             { new: true }
         )
     } else { //if doesn't exist, it will create a new one!
         return this.create({
-            PublishText: thought.thoughtText,
-            PublishAuthor: thought.thoughtAuthor,
-            originalThoughtId: thought._id,
+            PublishText: character.characterData,
+            PublishAuthor: character.characterCreator,
+            originalCharacterId: character._id,
             comments: []
         })
-
     }
 }
 
 interface IPublishModel extends Model<IPublish> {
-    createFromThought(thoughtId: string): Promise<IPublish>;
+    createFromCharacter(characterId: string): Promise<IPublish>;
 }
 
 const Publish = model<IPublish, IPublishModel>('Publish', PublishSchema);

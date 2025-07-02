@@ -13,16 +13,16 @@ const commentSchema = new Schema({
     toObject: { getters: true },
     timestamps: true,
 });
-// Define the schema for the Thought document
-const thoughtSchema = new Schema({
-    thoughtText: {
+// Define the schema for the Character document
+const characterSchema = new Schema({
+    characterData: {
         type: String,
         required: true,
         minlength: 1,
         maxlength: 280,
         trim: true,
     },
-    thoughtAuthor: {
+    characterCreator: {
         type: String,
         required: true,
         trim: true,
@@ -33,5 +33,5 @@ const thoughtSchema = new Schema({
     toJSON: { getters: true },
     toObject: { getters: true },
 });
-const Thought = model('Thought', thoughtSchema);
-export default Thought;
+const Character = model('Character', characterSchema);
+export default Character;

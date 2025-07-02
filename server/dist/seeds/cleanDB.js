@@ -1,10 +1,10 @@
-import { Thought, User } from '../models/index.js';
+import { Character, User } from '../models/index.js';
 import process from 'process';
 const cleanDB = async () => {
     try {
-        // Delete documents from THought collection
-        await Thought.deleteMany({});
-        console.log('Thought collection cleaned.');
+        // Delete documents from Character collection
+        await Character.deleteMany({});
+        console.log('Character collection cleaned.');
         // Delete documents from User collection
         await User.deleteMany({});
         console.log('User collection cleaned.');

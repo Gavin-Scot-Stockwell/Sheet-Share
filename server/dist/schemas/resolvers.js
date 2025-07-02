@@ -1,18 +1,18 @@
-import { Thought, User, Publish } from '../models/index.js';
+import { Character, User, Publish } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 const resolvers = {
     Query: {
         users: async () => {
-            return User.find().populate('thoughts');
+            return User.find().populate('characters');
         },
         user: async (_parent, { username }) => {
-            return User.findOne({ username }).populate('thoughts');
+            return User.findOne({ username }).populate('characters');
         },
-        thoughts: async () => {
-            return await Thought.find().sort({ createdAt: -1 });
+        characters: async () => {
+            return await Character.find().sort({ createdAt: -1 });
         },
-        thought: async (_parent, { thoughtId }) => {
-            return await Thought.findOne({ _id: thoughtId });
+        character: async (_parent, { characterId }) => {
+            return await Character.findOne({ _id: characterId });
         },
         publish: async (_parent, { publishId }) => {
             return await Publish.findOne({ _id: publishId });
@@ -20,55 +20,42 @@ const resolvers = {
         publishes: async () => {
             return await Publish.find().sort({ createdAt: -1 });
         },
-        // Query to get the authenticated user's information
-        // The 'me' query relies on the context to check if the user is authenticated
         me: async (_parent, _args, context) => {
-            // If the user is authenticated, find and return the user's information along with their thoughts
             if (context.user) {
-                return User.findOne({ _id: context.user._id }).populate('thoughts');
+                return User.findOne({ _id: context.user._id }).populate('characters');
             }
-            // If the user is not authenticated, throw an AuthenticationError
             throw new AuthenticationError('Could not authenticate user.');
         },
     },
     Mutation: {
         addUser: async (_parent, { input }) => {
-            // Create a new user with the provided username, email, and password
             const user = await User.create({ ...input });
-            // Sign a token with the user's information
             const token = signToken(user.username, user.email, user._id);
-            // Return the token and the user
             return { token, user };
         },
         login: async (_parent, { email, password }) => {
-            // Find a user with the provided email
             const user = await User.findOne({ email });
-            // If no user is found, throw an AuthenticationError
             if (!user) {
                 throw new AuthenticationError('Could not authenticate user.');
             }
-            // Check if the provided password is correct
             const correctPw = await user.isCorrectPassword(password);
-            // If the password is incorrect, throw an AuthenticationError
             if (!correctPw) {
                 throw new AuthenticationError('Could not authenticate user.');
             }
-            // Sign a token with the user's information
             const token = signToken(user.username, user.email, user._id);
-            // Return the token and the user
             return { token, user };
         },
-        addThought: async (_parent, { input }, context) => {
+        addCharacter: async (_parent, { input }, context) => {
             if (context.user) {
-                const thought = await Thought.create({ ...input });
-                await User.findOneAndUpdate({ _id: context.user._id }, { $addToSet: { thoughts: thought._id } });
-                return thought;
+                const character = await Character.create({ ...input });
+                await User.findOneAndUpdate({ _id: context.user._id }, { $addToSet: { characters: character._id } });
+                return character;
             }
             throw new AuthenticationError('You need to be logged in!');
         },
-        addComment: async (_parent, { thoughtId, commentText }, context) => {
+        addComment: async (_parent, { characterId, commentText }, context) => {
             if (context.user) {
-                return Thought.findOneAndUpdate({ _id: thoughtId }, {
+                return Character.findOneAndUpdate({ _id: characterId }, {
                     $addToSet: {
                         comments: { commentText, commentAuthor: context.user.username },
                     },
@@ -79,23 +66,23 @@ const resolvers = {
             }
             throw new AuthenticationError('You need to be logged in!');
         },
-        removeThought: async (_parent, { thoughtId }, context) => {
+        removeCharacter: async (_parent, { characterId }, context) => {
             if (context.user) {
-                const thought = await Thought.findOneAndDelete({
-                    _id: thoughtId,
-                    thoughtAuthor: context.user.username,
+                const character = await Character.findOneAndDelete({
+                    _id: characterId,
+                    characterCreator: context.user.username,
                 });
-                if (!thought) {
-                    throw new AuthenticationError('Thought not found or not authorized');
+                if (!character) {
+                    throw new AuthenticationError('Character not found or not authorized');
                 }
-                await User.findOneAndUpdate({ _id: context.user._id }, { $pull: { thoughts: thought._id } });
-                return thought;
+                await User.findOneAndUpdate({ _id: context.user._id }, { $pull: { characters: character._id } });
+                return character;
             }
             throw new AuthenticationError('You need to be logged in!');
         },
-        removeComment: async (_parent, { thoughtId, commentId }, context) => {
+        removeComment: async (_parent, { characterId, commentId }, context) => {
             if (context.user) {
-                return Thought.findOneAndUpdate({ _id: thoughtId }, {
+                return Character.findOneAndUpdate({ _id: characterId }, {
                     $pull: {
                         comments: {
                             _id: commentId,
@@ -119,25 +106,24 @@ const resolvers = {
             }
             throw new AuthenticationError('You need to be logged in!');
         },
-        updateThought: async (_parent, { thoughtId, input }, context) => {
+        updateCharacter: async (_parent, { characterId, input }, context) => {
             if (context.user) {
-                const thought = await Thought.findOneAndUpdate({
-                    _id: thoughtId,
-                    thoughtAuthor: context.user.username,
+                const character = await Character.findOneAndUpdate({
+                    _id: characterId,
+                    characterCreator: context.user.username,
                 }, { ...input }, { new: true, runValidators: true });
-                if (!thought) {
-                    throw new AuthenticationError('Thought not found or not authorized');
+                if (!character) {
+                    throw new AuthenticationError('Character not found or not authorized');
                 }
-                return thought;
+                return character;
             }
             throw new AuthenticationError('You need to be logged in!');
         },
-        //the resolver stuff in model
-        publishThought: async (_parent, { thoughtId }, context) => {
+        publishCharacter: async (_parent, { characterId }, context) => {
             if (!context.user) {
                 throw new AuthenticationError('You need to be logged in!');
             }
-            return await Publish.createFromThought(thoughtId);
+            return await Publish.createFromCharacter(characterId);
         },
     },
 };

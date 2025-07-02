@@ -1,14 +1,14 @@
 import { Schema, model, Document } from 'mongoose';
 
-// Define an interface for the Thought document
+// Define an interface for the Character document
 interface IComment extends Document {
   commentText: string;
   createdAt: Date;
 }
 
-interface IThought extends Document {
-  thoughtText: string;
-  thoughtAuthor: string;
+interface ICharacter extends Document {
+  characterData: string;
+  characterCreator: string;
   createdAt: Date;
   comments: IComment[];
 }
@@ -31,17 +31,17 @@ const commentSchema = new Schema<IComment>(
   }
 );
 
-// Define the schema for the Thought document
-const thoughtSchema = new Schema<IThought>(
+// Define the schema for the Character document
+const characterSchema = new Schema<ICharacter>(
   {
-    thoughtText: {
+    characterData: {
       type: String,
       required: true,
       minlength: 1,
       maxlength: 280,
       trim: true,
     },
-    thoughtAuthor: {
+    characterCreator: {
       type: String,
       required: true,
       trim: true,
@@ -55,6 +55,6 @@ const thoughtSchema = new Schema<IThought>(
   }
 );
 
-const Thought = model<IThought>('Thought', thoughtSchema);
+const Character = model<ICharacter>('Character', characterSchema);
 
-export default Thought;
+export default Character;
