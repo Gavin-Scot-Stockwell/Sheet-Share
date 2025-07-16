@@ -12,12 +12,24 @@ const pro = (event: number) => {
 
 const CharacterForm = () => {
   const [characterName, setCharacterName] = useState('');
+  const [race, setRace] = useState('');
+  const [clazz, setClazz] = useState('');
+  const [background, setBackground] = useState('');
   const [characterDescription, setCharacterDescription] = useState('');
   const [items, setItems] = useState<string[]>([]); // State for dynamic rows
   
+  const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
   //Level
   const [playerLv, setPlayerLv] = useState(0);
 
+  //Other
+//speed
+  const [speed, setSpeed] = useState(0);
+  const [swim, setSwim] = useState(0);
+  const [fly, setFly] = useState(0);
+  const [climb, setClimb] = useState(0);
+  const [AC, setAC] = useState(0);
+  const [initiative, setInitiative] = useState(0);
 
   //ability scores 
   const [STR, setSTR] = useState(0);
@@ -26,6 +38,14 @@ const CharacterForm = () => {
   const [INT, setINT] = useState(0);
   const [WIS, setWIS] = useState(0);
   const [CHA, setCHA] = useState(0);
+
+  const [STRsave, setSTRsave] = useState(false);
+  const [DEXsave, setDEXsave] = useState(false);
+  const [CONsave, setCONsave] = useState(false);
+  const [INTsave, setINTsave] = useState(false);
+  const [WISsave, setWISsave] = useState(false);
+  const [CHAsave, setCHAsave] = useState(false);
+
 
   //proficiency in skills
   const [ath, setAth] = useState(false); // Athletics
@@ -64,6 +84,21 @@ const CharacterForm = () => {
     updatedItems[index] = value;
     setItems(updatedItems);
   };
+
+    const addFeatureRow = () => {
+    setFeatures([...features, { name: '', value: '' }]); 
+  };
+
+  const updateFeatureRow = (index: number, key:"name" | "value", value: string) => {
+    const updatedFeature = [...features];
+    updatedFeature[index][key] = value;
+    setFeatures(updatedFeature);
+  
+
+  };
+
+
+
   const createPdf = async () => {
     try {
       // Create a new PDF document
@@ -159,8 +194,20 @@ const CharacterForm = () => {
           />
         </label>
       </div>
+      
+      <div>
+        <label>
+          Race:
+          <input
+            type="text"
+            value={race}
+            onChange={(e) => setRace(e.target.value)}
+            placeholder="Enter race"
+          />
+        </label>
+      </div>
 
-            <div>
+        <div>
         <label>
           Character Level:
           <input
@@ -174,11 +221,113 @@ const CharacterForm = () => {
 
       <div>
         <label>
+          Speed:
+          <input
+            type="text"
+            value={speed}
+            onChange={(e) => setSpeed(Number(e.target.value))}
+            placeholder="Enter character speed"
+          />
+        </label>
+        ft
+      </div>
+
+      <div>
+        <label>
+          Swim:
+          <input
+            type="text"
+            value={swim}
+            onChange={(e) => setSwim(Number(e.target.value))}
+            placeholder="Enter character swim speed"
+          />
+        </label>
+        ft
+      </div>
+
+      <div>
+        <label>
+          Climb:
+          <input
+            type="text"
+            value={climb}
+            onChange={(e) => setClimb(Number(e.target.value))}
+            placeholder="Enter character climb speed"
+          />
+        </label>
+        ft
+      </div>
+
+      <div>
+        <label>
+          Fly:
+          <input
+            type="text"
+            value={fly}
+            onChange={(e) => setFly(Number(e.target.value))}
+            placeholder="Enter character fly speed"
+          />
+        </label>
+        ft
+      </div>
+
+      <div>
+        <label>
+          AC:
+          <input
+            type="text"
+            value={AC}
+            onChange={(e) => setAC(Number(e.target.value))}
+            placeholder="Enter character Armor Class"
+          />
+        </label>
+      </div>
+
+            <div>
+        <label>
+          Initiative:
+          <input
+            type="text"
+            value={initiative}
+            onChange={(e) => setInitiative(Number(e.target.value))}
+            placeholder="Enter character Initiative"
+          />
+        </label>
+      </div>
+
+
+
+            <div>
+        <label>
+          Class:
+          <input
+            type="text"
+            value={clazz}
+            onChange={(e) => {setClazz(e.target.value)} }
+            placeholder="Enter Class"
+          />
+        </label>
+      </div>
+
+
+      <div>
+        <label>
           Description:
           <textarea
             value={characterDescription}
             onChange={(e) => setCharacterDescription(e.target.value)}
             placeholder="Enter character description"
+          ></textarea>
+        </label>
+      </div>
+
+            <div>
+        <label>
+          Background:
+          <textarea
+            value={background}
+            onChange={(e) => setBackground(e.target.value)}
+            placeholder="Enter character background"
           ></textarea>
         </label>
       </div>
@@ -570,13 +719,118 @@ const CharacterForm = () => {
     </span>
   </label>
 </div>
+
+<h1>Saving Throw</h1>
+
+<div>
+  <label>
+    Strength Save
+    <input
+      type="checkbox"
+      checked={STRsave}
+      onChange={(e) => setSTRsave(e.target.checked)}
+    />
+    <span>
+      {STRsave ? mod(STR) + pro(playerLv) : mod(STR)}
+    </span>
+  </label>
+</div>
+<div>
+  <label>
+    Dexterity Save
+    <input
+      type="checkbox"
+      checked={DEXsave}
+      onChange={(e) => setDEXsave(e.target.checked)}
+    />
+    <span>
+      {DEXsave ? mod(DEX) + pro(playerLv) : mod(DEX)}
+    </span>
+  </label>
+</div>
+<div>
+  <label>
+    Constitution Save
+    <input
+      type="checkbox"
+      checked={CONsave}
+      onChange={(e) => setCONsave(e.target.checked)}
+    />
+    <span>
+      {CONsave ? mod(CON) + pro(playerLv) : mod(CON)}
+    </span>
+  </label>
+</div>
+<div>
+  <label>
+    Intelligence Save
+    <input
+      type="checkbox"
+      checked={INTsave}
+      onChange={(e) => setINTsave(e.target.checked)}
+    />
+    <span>
+      {INTsave ? mod(INT) + pro(playerLv) : mod(INT)}
+    </span>
+  </label>
+</div>
+<div>
+  <label>
+    Wisdom Save
+    <input
+      type="checkbox"
+      checked={WISsave}
+      onChange={(e) => setWISsave(e.target.checked)}
+    />
+    <span>
+      {WISsave ? mod(WIS) + pro(playerLv) : mod(WIS)}
+    </span>
+  </label>
+</div>
+<div>
+  <label>
+    Charisma Save
+    <input
+      type="checkbox"
+      checked={CHAsave}
+      onChange={(e) => setCHAsave(e.target.checked)}
+    />
+    <span>
+      {CHAsave ? mod(CHA) + pro(playerLv) : mod(CHA)}
+    </span>
+  </label>
+</div>
+
+      <div>
+      <h1>Features</h1>
+        <button onClick={addFeatureRow}> Add Feature</button>
+        {features.map((feature, index) =>
+        (
+          <div key={index}>
+              <div>
+                <input
+                value={feature.name}
+                onChange ={(e)=> updateFeatureRow(index, "name", e.target.value)}
+                placeholder={`Feature Name`}
+                />
+              </div>
+              <div>
+                <textarea
+                value={feature.value}
+                onChange ={(e)=> updateFeatureRow(index, "value", e.target.value)}
+                placeholder={`Feature`}
+                />
+              </div>
+          </div>
+        ))}
+      </div>
+
       <div>
         <h4>Items</h4>
         <button onClick={addItemRow}>Add Item Row</button>
         {items.map((item, index) => (
           <div key={index}>
-            <input
-              type="text"
+            <textarea
               value={item}
               onChange={(e) => updateItem(index, e.target.value)}
               placeholder={`Item ${index + 1}`}
