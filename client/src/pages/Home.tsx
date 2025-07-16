@@ -1,3 +1,8 @@
+
+
+//click test
+
+
 const Home = () => {
 
   return (
@@ -9,7 +14,7 @@ const Home = () => {
           <p>Build characters for D&D 5e, Call of Cthulhu 7e, and more systems coming soon.</p>
         </div>
       </div>
-      
+
       <div className="flex-row justify-center">
         <div className="col-12 col-md-8">
         </div>
