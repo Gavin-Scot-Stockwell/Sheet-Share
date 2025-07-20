@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, range, rgb } from 'pdf-lib';
+import { defaultCacheSizes } from '@apollo/client/utilities';
 
 const mod = (event: number) => {
   return Math.floor((event - 10) / 2);
@@ -8,6 +9,24 @@ const mod = (event: number) => {
 const pro = (event: number) => {
   return Math.floor((event - 1 )/4)+2;
 };
+
+const rollDamage = () => {
+    let die = 4;
+    let amount = 2;
+    let bonus = 0;
+
+    let roll;
+    let sum = 0;
+    for(let i = 0; i < amount; i++){
+
+    roll = Math.floor(Math.random() * die)+1;
+    sum = sum + roll;
+
+  }
+  sum = sum + bonus;
+  console.log(sum)
+}
+
 
 
 const CharacterForm = () => {
@@ -19,6 +38,10 @@ const CharacterForm = () => {
   const [items, setItems] = useState<string[]>([]); // State for dynamic rows
   
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
+
+  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:string; damage:number, damage_type:string, die_amount:number}[]>([]); 
+
+
   //Level
   const [playerLv, setPlayerLv] = useState(0);
 
@@ -96,8 +119,32 @@ const CharacterForm = () => {
   
 
   };
+//name: string; hit: number; damage_dice:number; damage:number
+    const addAttackRow = () => {
+    setAttack([...attack, { name: '', hit: 0, damage_dice:'d4', damage:0, damage_type:'', die_amount:0}]); 
+  };
 
-
+  //REVIEW
+  const updateAttackRow = (
+    index: number,
+    key: "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount",
+    value: string | number
+  ) => {
+    const updatedAttack = [...attack];
+    if (key === "name") {
+      updatedAttack[index][key] = value as string;
+    } else if (key === "hit") {
+      updatedAttack[index][key] = value as number;
+    }else if (key === "die_amount") {
+      updatedAttack[index][key] = value as number;
+    }else if (key === "damage") {
+      updatedAttack[index][key] = value as number;
+    }else if (key === "damage_type") {
+      updatedAttack[index][key] = value as string;
+    }
+    
+    setAttack(updatedAttack);
+  };
 
   const createPdf = async () => {
     try {
@@ -821,6 +868,82 @@ const CharacterForm = () => {
                 placeholder={`Feature`}
                 />
               </div>
+          </div>
+        ))}
+      </div>
+
+              <div>
+      <h1>Attacks</h1>
+        <button onClick={addAttackRow}> Add Feature</button>
+        {attack.map((attack, index) =>
+        (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "8px",
+            }}
+          >
+            <input
+              style={{ width: "120px" }}
+              value={attack.name}
+              onChange={(e) => updateAttackRow(index, "name", e.target.value)}
+              placeholder="Attack Name"
+            />
+            hit
+            <input
+              type="number"
+              style={{ width: "60px" }}
+              value={attack.hit}
+              onChange={(e) => updateAttackRow(index, "hit", Number(e.target.value))}
+              placeholder="Hit"
+            />
+            <input
+              type="string"
+              style={{ width: "80px" }}
+              value={attack.die_amount}
+              onChange={(e) => updateAttackRow(index, "die_amount", Number(e.target.value))}
+              placeholder="Damage Dice"
+            />
+
+<select id="dieType">
+  <option value="4">d4</option>
+  <option value="6">d6</option>
+  <option value="8">d8</option>
+  <option value="10" selected>d10</option>
+  <option value="12" selected>d12</option>
+  <option value="20" selected>d20</option>
+</select>
+            Damage Bonus
+            <input
+              type="number"
+              style={{ width: "80px" }}
+              value={attack.damage}
+              onChange={(e) => updateAttackRow(index, "damage", Number(e.target.value))}
+              placeholder="Damage"
+            />
+          Damage Type
+<select id="damageType">
+  <option value="fire" selected>Fire</option>
+  <option value="cold" selected>Cold</option>
+  <option value="acid" selected>Acid</option>
+  <option value="lightning" selected>Lightning</option>
+  <option value="thunder">Thunder</option>
+  <option value="poison" selected>Poison</option>
+  <option value="slashing">Slashing</option>
+  <option value="piercing" selected>Piercing</option>
+  <option value="bludgeoning">Bludgeoning</option>
+  <option value="necrotic" selected>Necrotic</option>
+  <option value="radiant">Radiant</option>
+  <option value="force">Force</option>
+  <option value="psychic">Psychic</option>
+</select>
+
+<button onClick={rollDamage}>Roll Damage</button>
+          
+          
           </div>
         ))}
       </div>
