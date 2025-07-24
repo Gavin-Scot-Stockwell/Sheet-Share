@@ -10,11 +10,8 @@ const pro = (event: number) => {
   return Math.floor((event - 1 )/4)+2;
 };
 
-const rollDamage = () => {
-    let die = 4;
-    let amount = 2;
-    let bonus = 0;
-
+const rollDamage = (die:number,amount:number, bonus:number, ability:number) => {
+  
     let roll;
     let sum = 0;
     for(let i = 0; i < amount; i++){
@@ -23,10 +20,10 @@ const rollDamage = () => {
     sum = sum + roll;
 
   }
-  sum = sum + bonus;
+  sum = sum + bonus + ability;
   console.log(sum)
+  return sum
 }
-
 
 
 const CharacterForm = () => {
@@ -36,31 +33,35 @@ const CharacterForm = () => {
   const [background, setBackground] = useState('');
   const [characterDescription, setCharacterDescription] = useState('');
   const [items, setItems] = useState<string[]>([]); // State for dynamic rows
-  
+
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
 
-  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:string; damage:number, damage_type:string, die_amount:number}[]>([]); 
-
+  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number}[]>([]); 
+  const [sumAttack, setSumAttack] = useState(0)
 
   //Level
-  const [playerLv, setPlayerLv] = useState(0);
+  const [playerLv, setPlayerLv] = useState(1);
+  //ability scores 
+  const [STR, setSTR] = useState(10);
+  const [DEX, setDEX] = useState(10);
+  const [CON, setCON] = useState(10);
+  const [INT, setINT] = useState(10);
+  const [WIS, setWIS] = useState(10);
+  const [CHA, setCHA] = useState(10);
+  
+  const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA)];
+
 
   //Other
+  
 //speed
-  const [speed, setSpeed] = useState(0);
+  const [speed, setSpeed] = useState(30);
   const [swim, setSwim] = useState(0);
   const [fly, setFly] = useState(0);
   const [climb, setClimb] = useState(0);
-  const [AC, setAC] = useState(0);
-  const [initiative, setInitiative] = useState(0);
+  const [AC, setAC] = useState(10);
+  const [initiative, setInitiative] = useState(DEX);
 
-  //ability scores 
-  const [STR, setSTR] = useState(0);
-  const [DEX, setDEX] = useState(0);
-  const [CON, setCON] = useState(0);
-  const [INT, setINT] = useState(0);
-  const [WIS, setWIS] = useState(0);
-  const [CHA, setCHA] = useState(0);
 
   const [STRsave, setSTRsave] = useState(false);
   const [DEXsave, setDEXsave] = useState(false);
@@ -121,13 +122,13 @@ const CharacterForm = () => {
   };
 //name: string; hit: number; damage_dice:number; damage:number
     const addAttackRow = () => {
-    setAttack([...attack, { name: '', hit: 0, damage_dice:'d4', damage:0, damage_type:'', die_amount:0}]); 
+    setAttack([...attack, { name: '', hit: 0, damage_dice: 4, damage: 0, damage_type: '', die_amount: 0, damageType: '', abType:0 }]); 
   };
 
   //REVIEW
   const updateAttackRow = (
     index: number,
-    key: "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount",
+    key: "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount" | "damageType" | "abType",
     value: string | number
   ) => {
     const updatedAttack = [...attack];
@@ -141,6 +142,12 @@ const CharacterForm = () => {
       updatedAttack[index][key] = value as number;
     }else if (key === "damage_type") {
       updatedAttack[index][key] = value as string;
+    }else if (key === "damage_dice") {
+      updatedAttack[index][key] = value as number;
+    }else if (key === "damageType") {
+      updatedAttack[index][key] = value as string;
+    }else if (key === "abType") {
+      updatedAttack[index][key] = value as number;
     }
     
     setAttack(updatedAttack);
@@ -901,49 +908,71 @@ const CharacterForm = () => {
               placeholder="Hit"
             />
             <input
-              type="string"
+              id="die_amount"
+              type="number"
               style={{ width: "80px" }}
               value={attack.die_amount}
               onChange={(e) => updateAttackRow(index, "die_amount", Number(e.target.value))}
-              placeholder="Damage Dice"
+  
             />
 
-<select id="dieType">
-  <option value="4">d4</option>
-  <option value="6">d6</option>
-  <option value="8">d8</option>
-  <option value="10" selected>d10</option>
-  <option value="12" selected>d12</option>
-  <option value="20" selected>d20</option>
+<select id="dieType"
+value={attack.damage_dice}
+onChange={(e) => updateAttackRow(index, "damage_dice", Number(e.target.value))}
+>
+  <option defaultValue={4}>d4</option>
+  <option value={6}>d6</option>
+  <option value={8}>d8</option>
+  <option value={10}>d10</option>
+  <option value={12}>d12</option>
+  <option value={20}>d20</option>
+</select>
+
+Ability 
+<select id="abType"
+value={attack.abType}
+onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}
+>
+  <option value={0}>STR</option>
+  <option value={1}>DEX</option>
+  <option value={2}>CON</option>
+  <option value={3}>INT</option>
+  <option value={4}>WIS</option>
+  <option value={5}>CHA</option>
 </select>
             Damage Bonus
-            <input
+            <input id = "bonus"
               type="number"
               style={{ width: "80px" }}
               value={attack.damage}
               onChange={(e) => updateAttackRow(index, "damage", Number(e.target.value))}
-              placeholder="Damage"
+             
             />
           Damage Type
-<select id="damageType">
-  <option value="fire" selected>Fire</option>
-  <option value="cold" selected>Cold</option>
-  <option value="acid" selected>Acid</option>
-  <option value="lightning" selected>Lightning</option>
+<select id="damageType"
+>
+  <option defaultValue="fire" >Fire</option>
+  <option value="cold" >Cold</option>
+  <option value="acid" >Acid</option>
+  <option value="lightning" >Lightning</option>
   <option value="thunder">Thunder</option>
-  <option value="poison" selected>Poison</option>
+  <option value="poison" >Poison</option>
   <option value="slashing">Slashing</option>
-  <option value="piercing" selected>Piercing</option>
+  <option value="piercing" >Piercing</option>
   <option value="bludgeoning">Bludgeoning</option>
-  <option value="necrotic" selected>Necrotic</option>
+  <option value="necrotic">Necrotic</option>
   <option value="radiant">Radiant</option>
   <option value="force">Force</option>
   <option value="psychic">Psychic</option>
 </select>
 
-<button onClick={rollDamage}>Roll Damage</button>
-          
-          
+<button onClick={() =>  {const sum = rollDamage(attack.damage_dice, attack.die_amount, attack.damage, abMod[attack.abType])
+
+setSumAttack(sum)
+
+}}>Roll Damage</button>
+
+         <p>Damage {sumAttack}</p>
           </div>
         ))}
       </div>
