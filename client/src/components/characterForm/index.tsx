@@ -36,8 +36,8 @@ const CharacterForm = () => {
 
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
 
-  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number}[]>([]); 
-  const [sumAttack, setSumAttack] = useState(0)
+  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number, sumDamage:number}[]>([]); 
+
 
   //Level
   const [playerLv, setPlayerLv] = useState(1);
@@ -108,6 +108,10 @@ const CharacterForm = () => {
     updatedItems[index] = value;
     setItems(updatedItems);
   };
+
+
+
+
 
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
@@ -968,11 +972,12 @@ onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}
 
 <button onClick={() =>  {const sum = rollDamage(attack.damage_dice, attack.die_amount, attack.damage, abMod[attack.abType])
 
-setSumAttack(sum)
+
+   attack.sumDamage = sum;
 
 }}>Roll Damage</button>
 
-         <p>Damage {sumAttack}</p>
+         <p>Damage {sum}</p>
           </div>
         ))}
       </div>
