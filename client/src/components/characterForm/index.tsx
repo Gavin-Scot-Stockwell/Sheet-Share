@@ -55,8 +55,18 @@ const CharacterForm = () => {
 
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
 
-  const [attack, setAttack] = useState<{ name: string; hit: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number, sumDamage:number}[]>([]); 
-
+const [attack, setAttack] = useState<{
+  hitOrSave: boolean;
+  name: string;
+  hit: number;
+  save: number;
+  damage: number;
+  damage_type: string;
+  damageType: string;
+  abType: number;
+  sumDamage: number;
+  dice: { damage_dice: number; die_amount: number }[]; // Array of dice configurations
+}[]>([]);
 
   //Level
   const [playerLv, setPlayerLv] = useState(1);
@@ -68,10 +78,12 @@ const CharacterForm = () => {
   const [WIS, setWIS] = useState(10);
   const [CHA, setCHA] = useState(10);
   
-  const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA)];
+  const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA), 0];
+  const abSave = [spellSave(STR,playerLv), spellSave(DEX,playerLv), spellSave(CON,playerLv), spellSave(INT,playerLv), spellSave(WIS,playerLv), spellSave(CHA,playerLv)];
+  
 
   //spells
-  const [spell, setSpell] = useState<{ hitOrSave:Boolean; name: string; dis: string; hit: number; save: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number, sumDamage:number}[]>([]); 
+  //const [spell, setSpell] = useState<{ hitOrSave:Boolean; name: string; dis: string; hit: number; save: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number, sumDamage:number}[]>([]); 
 
   //Other
   
@@ -131,9 +143,6 @@ const CharacterForm = () => {
   };
 
 
-
-
-
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
   };
@@ -145,75 +154,75 @@ const CharacterForm = () => {
   
 
   };
-    const addAttackRow = () => {
-    setAttack([...attack, { name: '', hit: 0, damage_dice: 4, damage: 0, damage_type: '', die_amount: 0, damageType: '', abType:0, sumDamage: 0 }]); 
-  };
+const addAttackRow = () => {
+  setAttack([
+    ...attack,
+    {
+      hitOrSave: true,
+      name: '',
+      hit: 0,
+      save: 0,
+      damage: 0,
+      damage_type: '',
+      damageType: '',
+      abType: 0,
+      sumDamage: 0,
+      dice: [{ damage_dice: 4, die_amount: 1 }], // Default to 1d4
+    },
+  ]);
+};
 
   //REVIEW
-  const updateAttackRow = (
-    index: number,
-    key: "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount" | "damageType" | "abType" | "sumDamage",
-    value: string | number
-  ) => {
-    const updatedAttack = [...attack];
-    if (key === "name") {
-      updatedAttack[index][key] = value as string;
-    } else if (key === "hit") {
-      updatedAttack[index][key] = value as number;
-    }else if (key === "die_amount") {
-      updatedAttack[index][key] = value as number;
-    }else if (key === "damage") {
-      updatedAttack[index][key] = value as number;
-    }else if (key === "damage_type") {
-      updatedAttack[index][key] = value as string;
-    }else if (key === "damage_dice") {
-      updatedAttack[index][key] = value as number;
-    }else if (key === "damageType") {
-      updatedAttack[index][key] = value as string;
-    }else if (key === "abType") {
-      updatedAttack[index][key] = value as number;
-    }else if (key === "sumDamage") {
-      updatedAttack[index][key] = value as number;
-    }
-    
-    
-    setAttack(updatedAttack);
-  };
+const updateAttackRow = (
+  index: number,
+  key: 'hitOrSave' | 'name' | 'hit' | 'save' | 'damage' | 'damage_type' | 'damageType' | 'abType' | 'sumDamage' | 'dice' | 'damage_dice' | 'die_amount',
+  value: string | number | boolean
+) => {
+  const updateAttack = [...attack];
+  // @ts-ignore
+  updateAttack[index][key] = value;
+  setAttack(updateAttack);
+}
 
+const addDie = (index: number) => {
+  const updatedAttack = [...attack];
+  updatedAttack[index].dice.push({ damage_dice: 4, die_amount: 1 }); 
+  setAttack(updatedAttack);
+};
 
-    const addSpellRow = () => {
-    setSpell([...spell, { hitOrSave:true, name: '', dis: '', hit: 0, save: 0, damage_dice:0, damage:0, damage_type:'', die_amount:0, damageType:'', abType:0, sumDamage:0 }]); 
-  };
+  //   const addSpellRow = () => {
+  //   setSpell([...spell, { hitOrSave:true, name: '', dis: '', hit: 0, save: 0, damage_dice:0, damage:0, damage_type:'', die_amount:0, damageType:'', abType:0, sumDamage:0 }]); 
+  // };
 
-  const updateSpellRow = (
-    index: number,
-    key: "hitOrSave" | "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount" | "damageType" | "abType" | "sumDamage",
-    value: string | number | boolean
-  ) => {
-    const updatedSpell = [...spell];
-    if (key === "name") {
-      updatedSpell[index][key] = value as string;
-    } else if (key === "hit") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "die_amount") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "damage") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "damage_type") {
-      updatedSpell[index][key] = value as string;
-    } else if (key === "damage_dice") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "damageType") {
-      updatedSpell[index][key] = value as string;
-    } else if (key === "abType") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "sumDamage") {
-      updatedSpell[index][key] = value as number;
-    } else if (key === "hitOrSave") {
-      updatedSpell[index][key] = value as boolean;
-    }
-    setSpell(updatedSpell);
-  };
+  // const updateSpellRow = (
+  //   index: number,
+  //   key: "hitOrSave" | "name" | "hit" | "damage_dice" | "damage" | "damage_type" | "die_amount" | "damageType" | "abType" | "sumDamage",
+  //   value: string | number | boolean
+  // ) => {
+  //   const updatedSpell = [...spell];
+  //   if (key === "name") {
+  //     updatedSpell[index][key] = value as string;
+  //   } else if (key === "hit") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "die_amount") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "damage") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "damage_type") {
+  //     updatedSpell[index][key] = value as string;
+  //   } else if (key === "damage_dice") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "damageType") {
+  //     updatedSpell[index][key] = value as string;
+  //   } else if (key === "abType") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "sumDamage") {
+  //     updatedSpell[index][key] = value as number;
+  //   } else if (key === "hitOrSave") {
+  //     updatedSpell[index][key] = value as boolean;
+  //   }
+  //   setSpell(updatedSpell);
+  // };
 
   const createPdf = async () => {
     try {
@@ -961,14 +970,56 @@ const CharacterForm = () => {
               onChange={(e) => updateAttackRow(index, "name", e.target.value)}
               placeholder="Attack Name"
             />
-            hit
+           
+   
+
+            Hit?
+            <input
+              type="radio"
+              name={`hitOrSave-${index}`}
+              style={{ width: "60px" }}
+              value="value"
+              onChange={() => updateAttackRow(index, "hitOrSave", true)}
+            /> 
+            Save?
+            <input
+              type="radio"
+              name={`hitOrSave-${index}`}
+              style={{ width: "60px" }}
+              value="value"
+              onChange={() => updateAttackRow(index, "hitOrSave", false)}
+            /> 
+{attack.hitOrSave ?             
+            <div>
+            Hit
             <input
               type="number"
               style={{ width: "60px" }}
               value={attack.hit}
               onChange={(e) => updateAttackRow(index, "hit", Number(e.target.value))}
               placeholder="Hit"
-            />
+            /> 
+            </div>
+
+
+
+: <div> Save
+<select id="save"
+value={attack.save}
+onChange={(e) => updateAttackRow(index, "save", Number(e.target.value))}
+>
+  <option value={0}>STR</option>
+  <option value={1}>DEX</option>
+  <option value={2}>CON</option>
+  <option value={3}>INT</option>
+  <option value={4}>WIS</option>
+  <option value={5}>CHA</option>
+
+</select>
+<p>Save {abMod[attack.save]+8+pro(playerLv)} {}</p>
+</div>}
+
+            
             <input
               id="die_amount"
               type="number"
@@ -1001,6 +1052,8 @@ onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}
   <option value={3}>INT</option>
   <option value={4}>WIS</option>
   <option value={5}>CHA</option>
+  <option value={6}>None</option>
+
 </select>
             Damage Bonus
             <input id = "bonus"
