@@ -27,23 +27,15 @@ const rollDamage = (dice: { damage_dice: number; die_amount: number }[], bonus: 
   return sum;
 };
 
-
-const spellSave = (ability:number, proficiency:number) => {
-
-let sum;
-
-sum = ability + proficiency + 8;
-
-return sum;
-} 
-
-const spellAttack = (ability:number, proficiency:number) => {
-
-let sum;
-
-sum = ability + proficiency;
-
-return sum;
+const nameExpand = (title:string) =>{
+  
+  if( 9 * title.length < 500){
+  return 9 * title.length
+  } else {
+    return 500
+  }
+  
+  
 }
 
 
@@ -57,6 +49,10 @@ const CharacterForm = () => {
 
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
 
+  const [notes, setNotes] = useState<{title:string; value: string; }[]>([])
+
+
+  
 type Dice = {
   damage_dice: number;
   die_amount: number;
@@ -150,6 +146,23 @@ const [attack, setAttack] = useState<Attack[]>([]);
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
   };
+  //adds new version of the row
+  const addNoteRow = () => {
+    //the ...notes will be made and the array agrs are fill blank as seen below
+    setNotes([...notes, { title:'', value: ''}])
+  }
+
+  //we need to define stuff here so we can map it out later
+  //we define index as a number, and we use key to get both title and value
+  //using the UNION oprator to define both of them
+  //it being the key being the label part of it.
+  //due to both title and value being strings we can just use value once and that be the string being defined here
+  //when doing the union thing, it just finds the things then updates it 
+  const updateNoteRow = (index: number, key: "title" | "value", value: string) => {
+    const updatedNote = [...notes];
+    updatedNote[index][key] = value;
+    setNotes(updatedNote);
+  }
 
   const updateFeatureRow = (index: number, key:"name" | "value", value: string) => {
     const updatedFeature = [...features];
@@ -171,7 +184,7 @@ const addAttackRow = () => {
       damageType: '',
       abType: 0,
       sumDamage: 0,
-      dice: [{ damage_dice: 4, die_amount: 1 }], // Default to 1d4
+      dice: [{ damage_dice: 4, die_amount: 1 }], 
     },
   ]);
 };
@@ -444,7 +457,28 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           ></textarea>
         </label>
       </div>
-
+<div>{/*here1*/}
+  <label>Notes:
+    <button
+    onClick={addNoteRow}
+    >Add Note</button>{notes.map((notes, index)=>
+    <div>
+    <div key={index} >
+      <input style={{width:`${200 + nameExpand(notes.title)}px`}}
+      value={notes.title}
+      onChange ={(e)=> updateNoteRow(index, "title", e.target.value)}
+      />
+    </div>
+    <div key={index}>
+      <textarea
+      value={notes.value}
+      onChange={(e)=> updateNoteRow(index, "value", e.target.value)}
+      />
+    </div>
+    </div>
+    )}
+  </label>
+</div>
       {/* Ability Scores */}
       <div className="character-form-abilities">
         <label>
@@ -845,7 +879,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <h1 className="character-form-section-title">Features</h1>
         <button className="character-form-button" onClick={addFeatureRow}> Add Feature</button>
         {features.map((feature, index) =>
-        (
+        (//here1
           <div key={index} className="character-form-feature-row">
             <div>
               <input
@@ -1045,7 +1079,11 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       </div>
 
       <button className="character-form-button character-form-submit" onClick={createPdf}>Create PDF</button>
+    
+
+
     </div>
+    
   );
 };
 export default CharacterForm;
