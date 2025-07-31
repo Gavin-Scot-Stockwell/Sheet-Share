@@ -105,7 +105,8 @@ const [attack, setAttack] = useState<Attack[]>([]);
 
 
   //proficiency in skills
-  const [ath, setAth] = useState(false); // Athletics
+  const [ath, setAth] = useState(false); //Athletics
+  const [athE,setAthE] = useState(false); //Expertise Athletics
 
   // Dexterity skills
   const [acro, setAcro] = useState(false); // Acrobatics
@@ -614,6 +615,14 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           />
           <span>
             {ath ? mod(STR) + pro(playerLv) : mod(STR)}
+          </span>
+            <input 
+            type="checkbox"
+            checked={athE}
+            onChange={(e) => setAthE(e.target.checked)}
+          />
+          <span>
+            {athE ? mod(STR) + pro(playerLv)*2 : ""}
           </span>
         </label>
         <label>
