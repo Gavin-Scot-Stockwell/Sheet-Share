@@ -7,6 +7,7 @@
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
 }
 
 /* Section styling */
@@ -37,19 +38,76 @@
 /* Input fields */
 input[type="text"],
 input[type="number"],
-textarea,
 select {
   width: 100%;
-  max-width: 300px;
-  padding: 8px;
+  max-width: 320px;
+  padding: 14px 16px;
+  border: 1.5px solid #b0b0b0;
+  border-radius: 6px;
+  font-size: 17px;
+  background: #fff;
+  color: #222;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  transition: border 0.2s;
+}
+
+/* Give number inputs more room so the 0 isn't clipped */
+input[type="number"] {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+  background: #f0f8ff;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  pointer-events: all;
+}
+/* Make input fields larger and more readable */
+.character-form-input,
+.flex-container input,
+.flex-container select {
+  font-size: 16px;
+  padding: 18px 48px;
+  max-width: 540px;
+  letter-spacing: 1.2px;
+}
+
+/* Make text inside scrollable-container.attacks-section larger */
+.scrollable-container.attacks-section {
+  font-size: 18px;
+}
+input[type="number"] {
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #1a1a1a;
+  background: #fafbfc;
+}
+
+
+/* Larger textarea */
+textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 80px;
+  padding: 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
+  resize: vertical;
+  box-sizing: border-box;
 }
 
 /* Buttons */
 button {
-  padding: 8px 12px;
+  padding: 8px 20px;
   font-size: 14px;
   color: #fff;
   background-color: #007bff;
@@ -70,6 +128,9 @@ button:hover {
   padding: 10px;
   border-radius: 8px;
   background-color: #f7f7f7;
+  padding-left: 10px;
+  padding-right: 100px
+
 }
 
 /* Flex container for attacks, items, etc. */

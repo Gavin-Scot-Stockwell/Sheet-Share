@@ -88,12 +88,7 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [CHA, setCHA] = useState(10);
   
   const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA), 0];
-  const abSave = [spellSave(STR,playerLv), spellSave(DEX,playerLv), spellSave(CON,playerLv), spellSave(INT,playerLv), spellSave(WIS,playerLv), spellSave(CHA,playerLv)];
   
-
-  //spells
-  //const [spell, setSpell] = useState<{ hitOrSave:Boolean; name: string; dis: string; hit: number; save: number; damage_dice:number; damage:number, damage_type:string, die_amount:number, damageType:string, abType:number, sumDamage:number}[]>([]); 
-
   //Other
   
 //speed
@@ -201,9 +196,11 @@ const addDie = (index: number) => {
 
 
 const removeDie = (attackIndex: number, dieIndex: number) => {
+  if(confirm("Are you sure? This will remove the die from your sheet...")){
   const updatedAttack = [...attack];
   updatedAttack[attackIndex].dice.splice(dieIndex, 1); 
-  setAttack(updatedAttack); 
+  setAttack(updatedAttack);  
+  }
 };
 
 
@@ -871,7 +868,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       </div>
 
       <div className="character-form-section">
-        <h1 className="character-form-section-title">Attacks</h1>
+        <h1 className="character-form-section-title">Attacks And Spells</h1>
         <button className="character-form-button" onClick={addAttackRow}> Add Feature</button>
         {attack.map((attack, index) =>
         (
@@ -887,7 +884,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           >
             <input
               className="character-form-input"
-              style={{ width: "120px" }}
+              style={{ width:"auto" }}
               value={attack.name}
               onChange={(e) => updateAttackRow(index, "name", e.target.value)}
               placeholder="Attack Name"
@@ -956,6 +953,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <option value={20}>d20</option>
       </select>
       <input
+        style={{ width:"100px" }}
         className="character-form-input scrollable-container.attacks-section "
         type="number"
         value={die.die_amount}
@@ -967,7 +965,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       />
       <button
         className="character-form-button"
-        onClick={() => removeDie(index, dieIndex)}
+        onClick={() =>removeDie(index, dieIndex)}
       >
         Remove Die
       </button>
@@ -990,7 +988,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               {attack.sumDamage > 0 && `Damage: ${attack.sumDamage}`}
             </span>
             Ability 
-            <select id="abType"
+            <select id="abType" style={{width:"auto"}}
               className="character-form-input"
               value={attack.abType}
               onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}
@@ -1012,7 +1010,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               onChange={(e) => updateAttackRow(index, "damage", Number(e.target.value))}
             />
             Damage Type
-            <select id="damageType" className="character-form-input">
+            <select style={{width:"auto"}}id="damageType" className="character-form-input">
               <option defaultValue="fire" >Fire</option>
               <option value="cold" >Cold</option>
               <option value="acid" >Acid</option>
