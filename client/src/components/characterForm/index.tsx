@@ -69,6 +69,9 @@ type Attack = {
   abType: number;
   sumDamage: number;
   dice: Dice[];
+  pro: number;
+  proButton : boolean;
+  saveBonus: number;
 };
 
 const [attack, setAttack] = useState<Attack[]>([]);
@@ -199,10 +202,14 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [perfE, setPerfE] = useState(false); // Expertise Performance
   const [persE, setPersE] = useState(false); // Expertise Persuasion
   
+  //to hit the pro in the skill, and only show exp when clicked
   const hidPro = (isProficient:boolean, isExpertise:boolean, ability:number) => {
     if(isProficient && !isExpertise) {
     return mod(ability) + pro(playerLv)
-    } else return ""
+    } else if (isExpertise)  {
+       return "";
+    } 
+    return mod(ability)
   }
 
   const skills = (name:string,isProficient:boolean, setPro: (arg:boolean) => void, ability:number, isExpertise:boolean, setExp: (arg:boolean) => void ) => {
@@ -282,6 +289,10 @@ const addAttackRow = () => {
       abType: 0,
       sumDamage: 0,
       dice: [{ damage_dice: 4, die_amount: 1 }], 
+      pro: 0,
+      proButton: true,
+      saveBonus: 0,
+
     },
   ]);
 };
@@ -289,7 +300,7 @@ const addAttackRow = () => {
   //REVIEW
 const updateAttackRow = (
   index: number,
-  key: 'hitOrSave' | 'name' | 'hit' | 'save' | 'damage' | 'damage_type' | 'damageType' | 'abType' | 'sumDamage' | 'dice' | 'damage_dice' | 'die_amount',
+  key: 'hitOrSave' | 'name' | 'hit' | 'save' | 'damage' | 'damage_type' | 'damageType' | 'abType' | 'sumDamage' | 'dice' | 'damage_dice' | 'die_amount' | 'pro' | 'proButton' | 'saveBonus',
   value: string | number | boolean | number[]
 ) => {
   const updateAttack = [...attack];
@@ -554,7 +565,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           ></textarea>
         </label>
       </div>
-<div>{/*here1*/}
+<div>
   <label>Notes:
     <button
     onClick={addNoteRow}
@@ -623,7 +634,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <h1 className="character-form-section-title">Features</h1>
         <button className="character-form-button" onClick={addFeatureRow}> Add Feature</button>
         {features.map((feature, index) =>
-        (//here1
+        (
           <div key={index} className="character-form-feature-row">
             <div>
               <input
@@ -647,7 +658,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
 
       <div className="character-form-section">
         <h1 className="character-form-section-title">Attacks And Spells</h1>
-        <button className="character-form-button" onClick={addAttackRow}> Add Feature</button>
+        <button className="character-form-button" onClick={addAttackRow}> Add Attack Or Spell</button>
         {attack.map((attack, index) =>
         (
           <div
@@ -684,16 +695,40 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               onChange={() => updateAttackRow(index, "hitOrSave", false)}
             /> 
             {attack.hitOrSave ?             
-              <div>
-                Hit
+              <div> Hit
+              
+               <p>
+                Proficient
+                <input
+                type = "checkbox"
+                value={"value"} 
+                checked={attack.proButton}
+                onChange={() => updateAttackRow(index, "proButton", !attack.proButton)}
+                /></p>
+
+                <select id="hit"
+                  className="character-form-input"
+                  value={attack.pro}
+                  onChange={(e) => updateAttackRow(index, "pro", Number(e.target.value))}
+                >
+                  <option value={0}>STR</option>
+                  <option value={1}>DEX</option>
+                  <option value={2}>CON</option>
+                  <option value={3}>INT</option>
+                  <option value={4}>WIS</option>
+                  <option value={5}>CHA</option>
+                </select>
+
                 <input
                   type="number"
                   className="character-form-input"
-                  style={{ width: "60px" }}
+                  style={{ width: "100px" }}
                   value={attack.hit}
                   onChange={(e) => updateAttackRow(index, "hit", Number(e.target.value))}
                   placeholder="Hit"
                 /> 
+                <p> Hit: {attack.hit + abMod[attack.pro] + (attack.proButton ? pro(playerLv) : 0)}</p>
+             
               </div>
             : <div> Save
                 <select id="save"
@@ -708,7 +743,15 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                   <option value={4}>WIS</option>
                   <option value={5}>CHA</option>
                 </select>
-                <p>Save {abMod[attack.save]+8+pro(playerLv)} {}</p>
+                <input
+                  type="number"
+                  className="character-form-input"
+                  style={{ width: "100px" }}
+                  value={attack.saveBonus}
+                  onChange={(e) => updateAttackRow(index, "saveBonus", Number(e.target.value))}
+                  placeholder="Save Bonus"
+                /> 
+                <p>Save {abMod[attack.save]+8+pro(playerLv) + attack.saveBonus} {}</p>
               </div>
             }
            <div className="scrollable-container">
