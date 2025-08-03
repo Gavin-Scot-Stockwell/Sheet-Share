@@ -105,13 +105,18 @@ const [attack, setAttack] = useState<Attack[]>([]);
 
 
   //proficiency in skills
-  const [ath, setAth] = useState(false); //Athletics
-  const [athE,setAthE] = useState(false); //Expertise Athletics
-
+  const [ath, setAth] = useState(false); //  Athletics
+  
+  const [athE,setAthE] = useState(false); //  Expertise Athletics
+  
   // Dexterity skills
   const [acro, setAcro] = useState(false); // Acrobatics
   const [sleh, setSleh] = useState(false); // Sleight of Hand
   const [ste, setSte] = useState(false); // Stealth
+
+  const [acroE, setAcroE] = useState(false); // Expertise Acrobatics 
+  const [slehE, setSlehE] = useState(false); // Expertise Sleight of Hand
+  const [steE, setSteE] = useState(false); // Expertise Stealth
 
   // Intelligence skills
   const [arc, setArc] = useState(false); // Arcana
@@ -120,6 +125,13 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [nat, setNat] = useState(false); // Nature
   const [rel, setRel] = useState(false); // Religion
 
+
+  const [arcE, setArcE] = useState(false); // Expertise Arcana
+  const [hisE, setHisE] = useState(false); // Expertise History
+  const [invE, setInvE] = useState(false); // Expertise Investigation
+  const [natE, setNatE] = useState(false); // Expertise Nature
+  const [relE, setRelE] = useState(false); // Expertise Religion
+
   // Wisdom skills
   const [ani, setAni] = useState(false); // Animal Handling
   const [ins, setIns] = useState(false); // Insight
@@ -127,12 +139,50 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [per, setPer] = useState(false); // Perception
   const [sur, setSur] = useState(false); // Survival
 
+
+  const [aniE, setAniE] = useState(false); // Expertise Animal Handling
+  const [insE, setInsE] = useState(false); // Expertise Insight 
+  const [medE, setMedE] = useState(false); // Expertise Medicine
+  const [perE, setPerE] = useState(false); // Expertise Perception
+  const [surE, setSurE] = useState(false); // Expertise Survival
+
   // Charisma skills
   const [dec, setDec] = useState(false); // Deception
   const [intim, setIntim] = useState(false); // Intimidation
   const [perf, setPerf] = useState(false); // Performance
   const [pers, setPers] = useState(false); // Persuasion
+
+
+  const [decE, setDecE] = useState(false); // Expertise Deception
+  const [intimE, setIntimE] = useState(false); // Expertise Intimidation
+  const [perfE, setPerfE] = useState(false); // Expertise Performance
+  const [persE, setPersE] = useState(false); // Expertise Persuasion
   
+
+  const skills = (name:string,isProficient:boolean, setPro: (arg:boolean) => void, ability:number, isExpertise:boolean, setExp: (arg:boolean) => void ) => {
+           return(
+           <label>
+          {name}
+          <input 
+            type="checkbox"
+            checked={isProficient}
+            onChange={(e) => setPro(e.target.checked)}
+          />
+          <span>
+            {isProficient ? mod(ability) + pro(playerLv) : mod(ability)}
+          </span>
+            <input 
+            type="checkbox"
+            checked={isExpertise}
+            onChange={(e) => setExp(e.target.checked)}
+          />
+          <span>
+            {isExpertise ? mod(ability) + pro(playerLv)*2 : ""}
+          </span>
+        </label>
+           )
+  }
+
   const addItemRow = () => {
     setItems([...items, '']); // Add a new empty row
   };
@@ -606,212 +656,24 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       {/* Skills */}
       <h1 className="character-form-section-title">Skills</h1>
       <div className="character-form-skills">
-        <label>
-          Athletics
-          <input 
-            type="checkbox"
-            checked={ath}
-            onChange={(e) => setAth(e.target.checked)}
-          />
-          <span>
-            {ath ? mod(STR) + pro(playerLv) : mod(STR)}
-          </span>
-            <input 
-            type="checkbox"
-            checked={athE}
-            onChange={(e) => setAthE(e.target.checked)}
-          />
-          <span>
-            {athE ? mod(STR) + pro(playerLv)*2 : ""}
-          </span>
-        </label>
-        <label>
-          Acrobatics
-          <input
-            type="checkbox"
-            checked={acro}
-            onChange={(e) => setAcro(e.target.checked)}
-          />
-          <span>
-            {acro ? mod(DEX) + pro(playerLv) : mod(DEX)}
-          </span>
-        </label>
-        <label>
-          Sleight of Hand
-          <input
-            type="checkbox"
-            checked={sleh}
-            onChange={(e) => setSleh(e.target.checked)}
-          />
-          <span>
-            {sleh ? mod(DEX) + pro(playerLv) : mod(DEX)}
-          </span>
-        </label>
-        <label>
-          Stealth
-          <input
-            type="checkbox"
-            checked={ste}
-            onChange={(e) => setSte(e.target.checked)}
-          />
-          <span>
-            {ste ? mod(DEX) + pro(playerLv) : mod(DEX)}
-          </span>
-        </label>
-        <label>
-          Arcana
-          <input
-            type="checkbox"
-            checked={arc}
-            onChange={(e) => setArc(e.target.checked)}
-          />
-          <span>
-            {arc ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          History
-          <input
-            type="checkbox"
-            checked={his}
-            onChange={(e) => setHis(e.target.checked)}
-          />
-          <span>
-            {his ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          Investigation
-          <input
-            type="checkbox"
-            checked={inv}
-            onChange={(e) => setInv(e.target.checked)}
-          />
-          <span>
-            {inv ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          Nature
-          <input
-            type="checkbox"
-            checked={nat}
-            onChange={(e) => setNat(e.target.checked)}
-          />
-          <span>
-            {nat ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          Religion
-          <input
-            type="checkbox"
-            checked={rel}
-            onChange={(e) => setRel(e.target.checked)}
-          />
-          <span>
-            {rel ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          Animal Handling
-          <input
-            type="checkbox"
-            checked={ani}
-            onChange={(e) => setAni(e.target.checked)}
-          />
-          <span>
-            {ani ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Insight
-          <input
-            type="checkbox"
-            checked={ins}
-            onChange={(e) => setIns(e.target.checked)}
-          />
-          <span>
-            {ins ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Medicine
-          <input
-            type="checkbox"
-            checked={med}
-            onChange={(e) => setMed(e.target.checked)}
-          />
-          <span>
-            {med ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Perception
-          <input
-            type="checkbox"
-            checked={per}
-            onChange={(e) => setPer(e.target.checked)}
-          />
-          <span>
-            {per ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Survival
-          <input
-            type="checkbox"
-            checked={sur}
-            onChange={(e) => setSur(e.target.checked)}
-          />
-          <span>
-            {sur ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Deception
-          <input
-            type="checkbox"
-            checked={dec}
-            onChange={(e) => setDec(e.target.checked)}
-          />
-          <span>
-            {dec ? mod(CHA) + pro(playerLv) : mod(CHA)}
-          </span>
-        </label>
-        <label>
-          Intimidation
-          <input
-            type="checkbox"
-            checked={intim}
-            onChange={(e) => setIntim(e.target.checked)}
-          />
-          <span>
-            {intim ? mod(CHA) + pro(playerLv) : mod(CHA)}
-          </span>
-        </label>
-        <label>
-          Performance
-          <input
-            type="checkbox"
-            checked={perf}
-            onChange={(e) => setPerf(e.target.checked)}
-          />
-          <span>
-            {perf ? mod(CHA) + pro(playerLv) : mod(CHA)}
-          </span>
-        </label>
-        <label>
-          Persuasion
-          <input
-            type="checkbox"
-            checked={pers}
-            onChange={(e) => setPers(e.target.checked)}
-          />
-          <span>
-            {pers ? mod(CHA) + pro(playerLv) : mod(CHA)}
-          </span>
-        </label>
+        {skills("Athletics",ath,setAth, STR, athE, setAthE)}
+        {skills("Acrobatics", acro,setAcro,DEX, acroE,setAcroE)}
+        {skills("Sleight of Hand", sleh, setSleh, DEX, slehE, setSlehE)}
+        {skills("Stealth", ste, setSte, DEX, steE, setSteE)}
+        {skills("Arcana", arc, setArc, INT, arcE, setArcE)}
+        {skills("History", his, setHis, INT, hisE, setHisE)}
+        {skills("Investigation", inv, setInv, INT, invE, setInvE)}
+        {skills("Nature", nat, setNat, INT, natE, setNatE)}
+        {skills("Religion", rel, setRel, INT, relE, setRelE)}
+        {skills("Animal Handling", ani, setAni, WIS, aniE, setAniE)}
+        {skills("Insight", ins, setIns, WIS, insE, setInsE)}
+        {skills("Medicine", med, setMed, WIS, medE, setMedE)}
+        {skills("Perception", per, setPer, WIS, perE, setPerE)}
+        {skills("Survival", sur, setSur, WIS, surE, setSurE)}
+        {skills("Deception", dec, setDec, CHA, decE, setDecE)}
+        {skills("Intimidation", intim, setIntim, CHA, intimE, setIntimE)}
+        {skills("Performance", perf, setPerf, CHA, perfE, setPerfE)}
+        {skills("Persuasion", pers, setPers, CHA, persE, setPersE)}
       </div>
 
       <h1 className="character-form-section-title">Saving Throw</h1>
