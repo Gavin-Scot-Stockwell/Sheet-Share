@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { PDFDocument, range, rgb } from 'pdf-lib';
 import { defaultCacheSizes } from '@apollo/client/utilities';
 import "../../css/5ePC.css"
@@ -85,8 +85,33 @@ const [attack, setAttack] = useState<Attack[]>([]);
   
   const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA), 0];
   
-  //Other
+  const ability = (name:string, ability:number, setAbility: (arg:number) => void ) => {
+          return(
+          <div>
+          <label>
+          {name}
+          <input
+            className="character-form-input"
+            type="text"
+            value={ability}
+            onChange={(e) => setAbility(Number(e.target.value))}
+            placeholder= {`Enter your ${name} Score`}
+          />
+        </label>
+        <label>
+          {name} Modifier
+          <input
+            className="character-form-input"
+            value={ability ? mod(ability) : 0}
+            readOnly
+            placeholder="Auto-calculated"
+          />
+        </label>
+        </div>
+          )
+  }
   
+
 //speed
   const [speed, setSpeed] = useState(30);
   const [swim, setSwim] = useState(0);
@@ -102,6 +127,22 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [INTsave, setINTsave] = useState(false);
   const [WISsave, setWISsave] = useState(false);
   const [CHAsave, setCHAsave] = useState(false);
+
+  const save = (name:string, save:boolean, setSave:(arg:boolean) => void, ability:number) => {
+         return(
+          <label>
+          {name} Save
+          <input
+            type="checkbox"
+            checked={save}
+            onChange={(e) => setSave(e.target.checked)}
+          />
+          <span>
+            {save ? mod(ability) + pro(playerLv) : mod(ability)}
+          </span>
+        </label>
+         )
+  }
 
 
   //proficiency in skills
@@ -158,6 +199,11 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [perfE, setPerfE] = useState(false); // Expertise Performance
   const [persE, setPersE] = useState(false); // Expertise Persuasion
   
+  const hidPro = (isProficient:boolean, isExpertise:boolean, ability:number) => {
+    if(isProficient && !isExpertise) {
+    return mod(ability) + pro(playerLv)
+    } else return ""
+  }
 
   const skills = (name:string,isProficient:boolean, setPro: (arg:boolean) => void, ability:number, isExpertise:boolean, setExp: (arg:boolean) => void ) => {
            return(
@@ -169,7 +215,7 @@ const [attack, setAttack] = useState<Attack[]>([]);
             onChange={(e) => setPro(e.target.checked)}
           />
           <span>
-            {isProficient ? mod(ability) + pro(playerLv) : mod(ability)}
+            {hidPro(isProficient,isExpertise,ability)}
           </span>
             <input 
             type="checkbox"
@@ -532,126 +578,13 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
 </div>
       {/* Ability Scores */}
       <div className="character-form-abilities">
-        <label>
-          Strength
-          <input
-            className="character-form-input"
-            type="text"
-            value={STR}
-            onChange={(e) => setSTR(Number(e.target.value))}
-            placeholder="Enter Strength Score"
-          />
-        </label>
-        <label>
-          Strength Modifier
-          <input
-            className="character-form-input"
-            value={STR ? mod(STR) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-
-        <label>
-          Dexterity
-          <input
-            className="character-form-input"
-            type="text"
-            value={DEX}
-            onChange={(e) => setDEX(Number(e.target.value))}
-            placeholder="Enter Dexterity Score"
-          />
-        </label>
-        <label>
-          Dexterity Modifier
-          <input
-            className="character-form-input"
-            value={DEX ? mod(DEX) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-
-        <label>
-          Constitution
-          <input
-            className="character-form-input"
-            type="text"
-            value={CON}
-            onChange={(e) => setCON(Number(e.target.value))}
-            placeholder="Enter Constitution Score"
-          />
-        </label>
-        <label>
-          Constitution Modifier
-          <input
-            className="character-form-input"
-            value={CON ? mod(CON) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-
-        <label>
-          Intelligence
-          <input
-            className="character-form-input"
-            type="text"
-            value={INT}
-            onChange={(e) => setINT(Number(e.target.value))}
-            placeholder="Enter Intelligence Score"
-          />
-        </label>
-        <label>
-          Intelligence Modifier
-          <input
-            className="character-form-input"
-            value={INT ? mod(INT) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-
-        <label>
-          Wisdom
-          <input
-            className="character-form-input"
-            type="text"
-            value={WIS}
-            onChange={(e) => setWIS(Number(e.target.value))}
-            placeholder="Enter Wisdom Score"
-          />
-        </label>
-        <label>
-          Wisdom Modifier
-          <input
-            className="character-form-input"
-            value={WIS ? mod(WIS) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-
-        <label>
-          Charisma
-          <input
-            className="character-form-input"
-            type="text"
-            value={CHA}
-            onChange={(e) => setCHA(Number(e.target.value))}
-            placeholder="Enter Charisma Score"
-          />
-        </label>
-        <label>
-          Charisma Modifier
-          <input
-            className="character-form-input"
-            value={CHA ? mod(CHA) : 0}
-            readOnly
-            placeholder="Auto-calculated"
-          />
-        </label>
-      </div>
+       {ability("Strength", STR, setSTR)}
+       {ability("Dexterity", DEX, setDEX)}
+       {ability("Constitution", CON, setCON)}
+       {ability("Intelligence", INT, setINT)}
+       {ability("Wisdom", WIS, setWIS)}
+       {ability("Charisma", CHA, setCHA)}
+</div>
 
       {/* Skills */}
       <h1 className="character-form-section-title">Skills</h1>
@@ -678,72 +611,12 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
 
       <h1 className="character-form-section-title">Saving Throw</h1>
       <div className="character-form-saves">
-        <label>
-          Strength Save
-          <input
-            type="checkbox"
-            checked={STRsave}
-            onChange={(e) => setSTRsave(e.target.checked)}
-          />
-          <span>
-            {STRsave ? mod(STR) + pro(playerLv) : mod(STR)}
-          </span>
-        </label>
-        <label>
-          Dexterity Save
-          <input
-            type="checkbox"
-            checked={DEXsave}
-            onChange={(e) => setDEXsave(e.target.checked)}
-          />
-          <span>
-            {DEXsave ? mod(DEX) + pro(playerLv) : mod(DEX)}
-          </span>
-        </label>
-        <label>
-          Constitution Save
-          <input
-            type="checkbox"
-            checked={CONsave}
-            onChange={(e) => setCONsave(e.target.checked)}
-          />
-          <span>
-            {CONsave ? mod(CON) + pro(playerLv) : mod(CON)}
-          </span>
-        </label>
-        <label>
-          Intelligence Save
-          <input
-            type="checkbox"
-            checked={INTsave}
-            onChange={(e) => setINTsave(e.target.checked)}
-          />
-          <span>
-            {INTsave ? mod(INT) + pro(playerLv) : mod(INT)}
-          </span>
-        </label>
-        <label>
-          Wisdom Save
-          <input
-            type="checkbox"
-            checked={WISsave}
-            onChange={(e) => setWISsave(e.target.checked)}
-          />
-          <span>
-            {WISsave ? mod(WIS) + pro(playerLv) : mod(WIS)}
-          </span>
-        </label>
-        <label>
-          Charisma Save
-          <input
-            type="checkbox"
-            checked={CHAsave}
-            onChange={(e) => setCHAsave(e.target.checked)}
-          />
-          <span>
-            {CHAsave ? mod(CHA) + pro(playerLv) : mod(CHA)}
-          </span>
-        </label>
+        {save("Strength",STRsave,setSTRsave,STR)}
+        {save("Dexterity",DEXsave,setDEXsave,DEX)}
+        {save("Constitution",CONsave,setCONsave,CON)}
+        {save("Intelligence",INTsave,setINTsave,INT)}
+        {save("Wisdom",WISsave,setWISsave,WIS)}
+        {save("Charisma",CHAsave,setCHAsave,CHA)}
       </div>
 
       <div className="character-form-section">
