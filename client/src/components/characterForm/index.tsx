@@ -35,8 +35,8 @@ const nameExpand = (title:string) =>{
     return 500
   }
   
-  
 }
+
 
 
 const CharacterForm = () => {
@@ -45,14 +45,29 @@ const CharacterForm = () => {
   const [clazz, setClazz] = useState('');
   const [background, setBackground] = useState('');
   const [characterDescription, setCharacterDescription] = useState('');
-  const [items, setItems] = useState<string[]>([]); // State for dynamic rows
 
   const [features, setFeatures] = useState<{ name: string; value: string }[]>([]); 
 
   const [notes, setNotes] = useState<{title:string; value: string; }[]>([])
 
-
   
+  type Item ={
+    name:string; 
+    description:string; 
+    weight:number;
+  }
+  
+  const [items, setItems] = useState<Item[]>([]); // State for dynamic rows
+
+const weight = () => {
+  let sum = 0;
+  for(let i = 0; i < items.length; i++){
+    items[i].weight
+  sum = sum + Number(items[i].weight)
+  }
+  return sum
+}
+
 type Dice = {
   damage_dice: number;
   die_amount: number;
@@ -237,15 +252,15 @@ const [attack, setAttack] = useState<Attack[]>([]);
   }
 
   const addItemRow = () => {
-    setItems([...items, '']); // Add a new empty row
+    setItems([...items, {name:'', description:'', weight:0}]); // Add a new empty row
   };
-
-  const updateItem = (index: number, value: string) => {
+  
+  const updateItem = (index:number, key:"name" | "description" | "weight", value:string | number) => {
     const updatedItems = [...items];
-    updatedItems[index] = value;
+    // @ts-ignore
+    updatedItems[index][key] = value;
     setItems(updatedItems);
   };
-
 
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
@@ -423,13 +438,13 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       
       <div className="character-form-section">
         <label>
-          Race:
+          Species:
           <input
             className="character-form-input"
             type="text"
             value={race}
             onChange={(e) => setRace(e.target.value)}
-            placeholder="Enter race"
+            placeholder="Enter Species"
           />
         </label>
       </div>
@@ -855,14 +870,27 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <button className="character-form-button" onClick={addItemRow}>Add Item Row</button>
         {items.map((item, index) => (
           <div key={index}>
-            <textarea
+            <input
               className="character-form-textarea"
-              value={item}
-              onChange={(e) => updateItem(index, e.target.value)}
+              value={item.name}
+              onChange={(e) => updateItem(index, "name" ,e.target.value)}
               placeholder={`Item ${index + 1}`}
             />
+              <textarea
+              className="character-form-textarea"
+              value={item.description}
+              onChange={(e) => updateItem(index, "description" ,e.target.value)}
+              placeholder={`Description ${index + 1}`}
+            />
+              <input
+              className="character-form-textarea"
+              value={item.weight}
+              onChange={(e) => updateItem(index, "weight" ,e.target.value)}
+              placeholder={`Weight ${index + 1}`}
+            />
           </div>
-        ))}
+        ))} 
+        <p>{items[0] ? Number(weight()) : ''}</p>
       </div>
 
       <button className="character-form-button character-form-submit" onClick={createPdf}>Create PDF</button>
