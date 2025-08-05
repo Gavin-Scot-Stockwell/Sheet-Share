@@ -50,11 +50,15 @@ const CharacterForm = () => {
 
   const [notes, setNotes] = useState<{title:string; value: string; }[]>([])
 
-  
-  type Item ={
+  //weight stuff
+  const [size, setSize] = useState('Tiny')
+  const [carry, setCarry] = useState(7.5)
+
+  type Item = {
     name:string; 
     description:string; 
     weight:number;
+    amount:number;
   }
   
   const [items, setItems] = useState<Item[]>([]); // State for dynamic rows
@@ -62,8 +66,11 @@ const CharacterForm = () => {
 const weight = () => {
   let sum = 0;
   for(let i = 0; i < items.length; i++){
-    items[i].weight
-  sum = sum + Number(items[i].weight)
+
+    sum = sum + Number(items[i].weight * items[i].amount)
+   
+   
+    console.log(items[i].amount)
   }
   return sum
 }
@@ -100,7 +107,19 @@ const [attack, setAttack] = useState<Attack[]>([]);
   const [INT, setINT] = useState(10);
   const [WIS, setWIS] = useState(10);
   const [CHA, setCHA] = useState(10);
-  
+
+  //vars for carry and drag/lift/push
+  const trueCarry = carry*STR;
+  const trueDLP = carry*STR*2;    
+
+  const weightWarning = () => {
+    if( weight() > trueCarry){
+    return true;
+    } 
+    return false;
+    //when weight is not over it will return false
+  }
+
   const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA), 0];
   
   const ability = (name:string, ability:number, setAbility: (arg:number) => void ) => {
@@ -252,10 +271,10 @@ const [attack, setAttack] = useState<Attack[]>([]);
   }
 
   const addItemRow = () => {
-    setItems([...items, {name:'', description:'', weight:0}]); // Add a new empty row
+    setItems([...items, {name:'', description:'', weight:0, amount:1}]); // Add a new empty row
   };
   
-  const updateItem = (index:number, key:"name" | "description" | "weight", value:string | number) => {
+  const updateItem = (index:number, key:"name" | "description" | "weight" | "amount", value:string | number) => {
     const updatedItems = [...items];
     // @ts-ignore
     updatedItems[index][key] = value;
@@ -265,6 +284,7 @@ const [attack, setAttack] = useState<Attack[]>([]);
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
   };
+
   //adds new version of the row
   const addNoteRow = () => {
     //the ...notes will be made and the array agrs are fill blank as seen below
@@ -556,6 +576,45 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           />
         </label>
       </div>
+
+      <div className="character-form-section">
+        <label>
+          Size:
+                <select id="size"
+                  className="character-form-input"
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                >
+                  <option value={"Tiny"}>Tiny</option>
+                  <option value={"Small"}>Small</option>
+                  <option value={"Medium"}>Medium</option>
+                  <option value={"Large"}>Large</option>
+                  <option value={"Huge"}>Huge</option>
+                  <option value={"Gargantuan"}>Gargantuan</option>
+                </select>
+        </label>
+      </div>
+
+            <div className="character-form-section">
+        <label>{/*using the same var for push lift drag, just need to double values*/}
+          Carry:
+                <select id="carry"
+                  className="character-form-input"
+                  value={carry}
+                  onChange={(e) => setCarry(Number(e.target.value))}
+                >
+                  <option value={7.5}>Tiny</option>
+                  <option value={15}>Small</option>                  
+                  <option value={15}>Medium</option>                 
+                  <option value={30}>Large</option>
+                  <option value={60}>Huge</option>
+                  <option value={120}>Gargantuan</option>
+                </select>
+        </label>
+        <p>Carry Weight: {trueCarry}</p>
+        <p>Drag/Lift/Push: {trueDLP}</p>
+      </div>
+
 
       <div className="character-form-section">
         <label>
@@ -876,6 +935,13 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               onChange={(e) => updateItem(index, "name" ,e.target.value)}
               placeholder={`Item ${index + 1}`}
             />
+            <input
+              className="character-form-textarea"
+              value={item.amount}
+              onChange={(e) => updateItem(index, "amount" ,e.target.value)}
+              placeholder={`Weight ${index + 1}`}
+            />
+         
               <textarea
               className="character-form-textarea"
               value={item.description}
@@ -888,11 +954,19 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               onChange={(e) => updateItem(index, "weight" ,e.target.value)}
               placeholder={`Weight ${index + 1}`}
             />
+          <p>{item.name} Weighs {item.weight*item.amount} lbs</p>
+          <p>amount of {item.name}: {item.amount}</p>
           </div>
         ))} 
-        <p>{items[0] ? Number(weight()) : ''}</p>
+        <p style = {{
+          color: weightWarning() ? "red" : "black"
+        }}
+        
+        >Carrying Capacity {items[0] ? Number(weight()) : ''}lbs / {trueCarry}lbs</p>
+        {weightWarning() ? <h1 style ={{color: "red"}}>Encumbered! Warning! You are carrying too much weight! </h1> : <p></p>}
       </div>
-
+        <p>Carry Weight: {trueCarry}</p>
+        <p>Drag/Lift/Push: {trueDLP}</p>
       <button className="character-form-button character-form-submit" onClick={createPdf}>Create PDF</button>
     
 
