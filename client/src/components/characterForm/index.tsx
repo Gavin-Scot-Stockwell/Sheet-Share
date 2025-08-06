@@ -50,6 +50,9 @@ const CharacterForm = () => {
 
   const [notes, setNotes] = useState<{title:string; value: string; }[]>([])
 
+  //turning carry weight on and off
+  const [encumbered, encumberedSet] = useState(true)
+
   //weight stuff
   const [size, setSize] = useState('Tiny')
   const [carry, setCarry] = useState(7.5)
@@ -73,6 +76,14 @@ const weight = () => {
     console.log(items[i].amount)
   }
   return sum
+}
+
+const moneyDown = () => {
+  let test = 1000; //this is pp
+  let sum;
+  sum = test % 10 
+
+  console.log(sum)
 }
 
 type Dice = {
@@ -119,6 +130,12 @@ const [attack, setAttack] = useState<Attack[]>([]);
     return false;
     //when weight is not over it will return false
   }
+
+  //max health
+  const [maxHp, setMaxHp] = useState(0)
+
+  //current health
+  const [currentHp, setCurrentHp] = useState(0)
 
   const abMod = [mod(STR), mod(DEX), mod(CON), mod(INT), mod(WIS), mod(CHA), 0];
   
@@ -274,7 +291,7 @@ const [attack, setAttack] = useState<Attack[]>([]);
     setItems([...items, {name:'', description:'', weight:0, amount:1}]); // Add a new empty row
   };
   
-  const updateItem = (index:number, key:"name" | "description" | "weight" | "amount", value:string | number) => {
+  const updateItem = (index:number, key: "name" | "description" | "weight" | "amount", value:string | number) => {
     const updatedItems = [...items];
     // @ts-ignore
     updatedItems[index][key] = value;
@@ -441,6 +458,10 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
   };
   return (
     <div className="character-form-container">
+      
+      <button onClick={moneyDown}>money test</button>
+      
+      
       <h3 className="character-form-title">Create Your D&D 5e Character</h3>
 
       <div className="character-form-section">
@@ -660,6 +681,27 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
     </div>
     )}
   </label>
+  
+  <div>
+    <h1>Health</h1>
+  <input
+        style={{ width:"100px" }}
+        className="character-form-input scrollable-container.attacks-section "
+        type="number"
+        value={maxHp}
+        onChange={ (e) => setMaxHp(Number(e.target.value))}
+  />
+  /
+  <input
+        style={{ width:"100px" }}
+        className="character-form-input scrollable-container.attacks-section "
+        type="number"
+        value={currentHp}
+        onChange={ (e) => setCurrentHp(Number(e.target.value))}
+  />
+  
+  </div>
+
 </div>
       {/* Ability Scores */}
       <div className="character-form-abilities">
@@ -924,6 +966,14 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         ))}
       </div>
 
+                <p>
+                Encumbered {encumbered ? 'on' : 'off'}
+                <input
+                type = "checkbox"
+                value={"value"} 
+                checked={encumbered}
+                onChange={() => encumberedSet(!encumbered)}
+        /></p> 
       <div className="character-form-section">
         <h4 className="character-form-section-title">Items</h4>
         <button className="character-form-button" onClick={addItemRow}>Add Item Row</button>
@@ -958,15 +1008,32 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
           <p>amount of {item.name}: {item.amount}</p>
           </div>
         ))} 
-        <p style = {{
-          color: weightWarning() ? "red" : "black"
-        }}
-        
-        >Carrying Capacity {items[0] ? Number(weight()) : ''}lbs / {trueCarry}lbs</p>
-        {weightWarning() ? <h1 style ={{color: "red"}}>Encumbered! Warning! You are carrying too much weight! </h1> : <p></p>}
+
+     
+
       </div>
-        <p>Carry Weight: {trueCarry}</p>
-        <p>Drag/Lift/Push: {trueDLP}</p>
+       
+
+{encumbered ? (
+  <>
+    <p style={{
+      color: weightWarning() ? "red" : "black"
+    }}>
+      Carrying Capacity {items[0] ? Number(weight()) : ''}lbs / {trueCarry}lbs
+    </p>
+    {weightWarning() ? (
+      <h1 style={{ color: "red" }}>
+        Encumbered! Warning! You are carrying too much weight!
+      </h1>
+    ) : (
+      <p></p>
+    )}
+    <p>Carry Weight: {trueCarry}</p>
+  </>
+) : (
+  <p>Carry Weight: NONE</p>
+)}
+<p>Drag/Lift/Push: {trueDLP}</p>
       <button className="character-form-button character-form-submit" onClick={createPdf}>Create PDF</button>
     
 
