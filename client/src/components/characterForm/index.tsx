@@ -65,9 +65,9 @@ const CharacterForm = () => {
   const [pp, ppSet] = useState(0)
 
   const [conPP,setConPP] = useState(0)
-
-
-
+  const [conGP,setConGP] = useState(0)
+  const [conEP,setConEP] = useState(0)
+  const [conSP,setConSP] = useState(0)
 
 
 
@@ -107,7 +107,7 @@ highFun(highPool)
 lowFun(lowPool)
 }
 
-console.log("pp:",highPool," ","gp:",lowPool);
+//console.log("pp:",highPool," ","gp:",lowPool);
 
 
 }
@@ -128,7 +128,7 @@ lowPool = lowPool + (lowValue * Mul);//this was 10
 highFun(highPool);
 lowFun(lowPool);
 }
-console.log("pp:",highPool," ","gp:",lowPool);
+//console.log("pp:",highPool," ","gp:",lowPool);
 
 
 }
@@ -534,9 +534,15 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       <button onClick={(e) => moneyDown(gp,ep,1,2,gpSet,epSet)}>money down</button>
       <button onClick={(e) => moneyUp(gp,ep,1,2,gpSet,epSet)}>money up</button>
         
-      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet, conPP)}>money down bulk</button>
-      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet, conPP)}>money up bulk</button>
+      <button onClick={(e) => moneyDown(gp,ep,1,2,gpSet,epSet, conGP)}>money down bulk</button>
+      <button onClick={(e) => moneyUp(gp,ep,1,2,gpSet,epSet, conGP)}>money up bulk</button>
 
+          <input
+            className="character-form-input"
+            type="number"
+            value={conGP}
+            onChange={(e) => setConGP(Number(e.target.value))}
+            />
 
         <ul>gp: 
                   <input
@@ -550,6 +556,17 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                           {/*ep to sp*/}
       <button onClick={(e) => moneyDown(ep,sp,1,5,epSet,spSet)}>money down</button>
       <button onClick={(e) => moneyUp(ep,sp,1,5,epSet,spSet)}>money up</button>
+      
+      <button onClick={(e) => moneyDown(ep,sp,1,5,epSet,spSet, conEP)}>money down bulk</button>
+      <button onClick={(e) => moneyUp(ep,sp,1,5,epSet,spSet, conEP)}>money up bulk</button>
+
+          <input
+            className="character-form-input"
+            type="number"
+            value={conEP}
+            onChange={(e) => setConEP(Number(e.target.value))}
+            />
+      
         <ul>ep: 
                   <input
             className="character-form-input"
@@ -561,6 +578,17 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                         {/*sp to cp*/}
       <button onClick={(e) => moneyDown(sp,cp,1,10,spSet,cpSet)}>money down</button>
       <button onClick={(e) => moneyUp(sp,cp,1,10,spSet,cpSet)}>money up</button>
+
+      <button onClick={(e) => moneyDown(sp,cp,1,10,spSet,cpSet, conSP)}>money down bulk</button>
+      <button onClick={(e) => moneyUp(sp,cp,1,10,spSet,cpSet, conSP)}>money up bulk</button>
+
+          <input
+            className="character-form-input"
+            type="number"
+            value={conSP}
+            onChange={(e) => setConSP(Number(e.target.value))}
+            /> 
+        
         <ul>sp:         <input
             className="character-form-input"
             type="number"
