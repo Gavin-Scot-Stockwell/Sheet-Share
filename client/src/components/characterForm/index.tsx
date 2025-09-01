@@ -57,14 +57,30 @@ const CharacterForm = () => {
   const [size, setSize] = useState('Tiny')
   const [carry, setCarry] = useState(7.5)
 
+  //money
+  const [cp, cpSet] = useState(0)
+  const [sp, spSet] = useState(0)
+  const [ep, epSet] = useState(0)
+  const [gp, gpSet] = useState(0)
+  const [pp, ppSet] = useState(0)
+
+  const [conPP,setConPP] = useState(0)
+
+
+
+
+
+
+
+
   type Item = {
     name:string; 
     description:string; 
     weight:number;
     amount:number;
   }
-  
-  const [items, setItems] = useState<Item[]>([]); // State for dynamic rows
+
+const [items, setItems] = useState<Item[]>([]); // State for dynamic rows
 
 const weight = () => {
   let sum = 0;
@@ -78,12 +94,43 @@ const weight = () => {
   return sum
 }
 
-const moneyDown = () => {
-  let test = 1000; //this is pp
-  let sum;
-  sum = test % 10 
 
-  console.log(sum)
+const moneyUp = (highPool:number, lowPool:number, highValue:number, lowValue:number, highFun:Function, lowFun:Function, Mul?:number) => {
+if(Mul === undefined){
+  Mul = 1;
+}
+
+if(lowPool !== 0 && lowPool >= lowValue * Mul) {
+highPool = highPool + (highValue * Mul);//this was 10
+lowPool = lowPool - (lowValue * Mul);//this was 1
+highFun(highPool)
+lowFun(lowPool)
+}
+
+console.log("pp:",highPool," ","gp:",lowPool);
+
+
+}
+
+
+
+const moneyDown = (highPool:number, lowPool:number, highValue:number, lowValue:number, highFun:Function, lowFun:Function, Mul?:number) => {
+if(Mul === undefined){
+  Mul = 1;
+}
+
+if(highPool !== 0 && highPool >= highValue * Mul) {
+
+
+
+highPool = highPool - (highValue * Mul);//this was 1
+lowPool = lowPool + (lowValue * Mul);//this was 10 
+highFun(highPool);
+lowFun(lowPool);
+}
+console.log("pp:",highPool," ","gp:",lowPool);
+
+
 }
 
 type Dice = {
@@ -327,6 +374,7 @@ const [attack, setAttack] = useState<Attack[]>([]);
   
 
   };
+
 const addAttackRow = () => {
   setAttack([
     ...attack,
@@ -444,23 +492,94 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       });
 
       // Serialize the PDF document
-      const pdfBytes = await pdfDoc.save();
+      //const pdfBytes = await pdfDoc.save();
 
       // Trigger download
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'CharacterSheet.pdf';
-      link.click();
+      // const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      // const link = document.createElement('a');
+      // link.href = URL.createObjectURL(blob);
+      // link.download = 'CharacterSheet.pdf';
+      // link.click();
     } catch (error) {
       console.error('Error creating PDF:', error);
     }
   };
   return (
     <div className="character-form-container">
+      <p>
+              {/*pp and gp*/}
+      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet)}>money down</button>
+      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet)}>money up</button>
+
       
-      <button onClick={moneyDown}>money test</button>
+      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet, conPP)}>money down bulk</button>
+      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet, conPP)}>money up bulk</button>
+
+          <input
+            className="character-form-input"
+            type="number"
+            value={conPP}
+            onChange={(e) => setConPP(Number(e.target.value))}
+            />
+
+        <ul>pp:
+        <input
+            className="character-form-input"
+            type="number"
+            value={pp}
+            onChange={(e) => ppSet(Number(e.target.value))}
+            />
+        </ul>
+                  {/*gp and ep*/}
+      <button onClick={(e) => moneyDown(gp,ep,1,2,gpSet,epSet)}>money down</button>
+      <button onClick={(e) => moneyUp(gp,ep,1,2,gpSet,epSet)}>money up</button>
+        
+      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet, conPP)}>money down bulk</button>
+      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet, conPP)}>money up bulk</button>
+
+
+        <ul>gp: 
+                  <input
+            className="character-form-input"
+            type="number"
+            value={gp}
+            onChange={(e) => gpSet(Number(e.target.value))}
+            />
+        </ul>
+
+                          {/*ep to sp*/}
+      <button onClick={(e) => moneyDown(ep,sp,1,5,epSet,spSet)}>money down</button>
+      <button onClick={(e) => moneyUp(ep,sp,1,5,epSet,spSet)}>money up</button>
+        <ul>ep: 
+                  <input
+            className="character-form-input"
+            type="number"
+            value={ep}
+            onChange={(e) => epSet(Number(e.target.value))}
+            />
+        </ul>
+                        {/*sp to cp*/}
+      <button onClick={(e) => moneyDown(sp,cp,1,10,spSet,cpSet)}>money down</button>
+      <button onClick={(e) => moneyUp(sp,cp,1,10,spSet,cpSet)}>money up</button>
+        <ul>sp:         <input
+            className="character-form-input"
+            type="number"
+            value={sp}
+            onChange={(e) => spSet(Number(e.target.value))}
+            /></ul>
+                        {/*cp*/}
+     
+        <ul>cp:   <input
+            className="character-form-input"
+            type="number"
+            value={cp}
+            onChange={(e) => cpSet(Number(e.target.value))}
+            /></ul>
+      </p>
       
+
+      
+
       
       <h3 className="character-form-title">Create Your D&D 5e Character</h3>
 
