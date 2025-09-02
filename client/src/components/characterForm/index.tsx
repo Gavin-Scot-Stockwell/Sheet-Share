@@ -1,7 +1,8 @@
-import  { useState } from 'react';
+import  { useState, useRef } from 'react';
 import { PDFDocument, range, rgb } from 'pdf-lib';
 import { defaultCacheSizes } from '@apollo/client/utilities';
 import "../../css/5ePC.css"
+
 
 const mod = (event: number) => {
   return Math.floor((event - 10) / 2);
@@ -40,6 +41,11 @@ const nameExpand = (title:string) =>{
 
 
 const CharacterForm = () => {
+
+
+
+
+
   const [characterName, setCharacterName] = useState('');
   const [race, setRace] = useState('');
   const [clazz, setClazz] = useState('');
@@ -94,6 +100,38 @@ const weight = () => {
   return sum
 }
 
+//////////////////////
+
+
+
+
+
+const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+//setting up genetics to then be used for fun
+const holdDown = (fun: Function) => {
+  fun();//using to do it once
+
+  if (!intervalRef.current) {
+    intervalRef.current = setInterval(fun, 100);
+  //looping with ref and set Interval
+  }
+};
+
+const stopHold = () => {
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+    //check if value isn't null
+    //then clears the interval
+    //then sets to null to restart later
+  }
+};
+
+
+
+
+
+///////////////
 
 const moneyUp = (highPool:number, lowPool:number, highValue:number, lowValue:number, highFun:Function, lowFun:Function, Mul?:number) => {
 if(Mul === undefined){
@@ -101,10 +139,14 @@ if(Mul === undefined){
 }
 
 if(lowPool !== 0 && lowPool >= lowValue * Mul) {
-highPool = highPool + (highValue * Mul);//this was 10
-lowPool = lowPool - (lowValue * Mul);//this was 1
-highFun(highPool)
-lowFun(lowPool)
+highFun((prevHigh: number) => {
+  if (prevHigh >= highValue * Mul!) {
+    lowFun((prevLow: number) => prevLow - lowValue * Mul!);
+    return prevHigh + highValue * Mul!;
+  }
+  return prevHigh;
+
+});
 }
 
 //console.log("pp:",highPool," ","gp:",lowPool);
@@ -115,7 +157,9 @@ lowFun(lowPool)
 
 
 const moneyDown = (highPool:number, lowPool:number, highValue:number, lowValue:number, highFun:Function, lowFun:Function, Mul?:number) => {
-if(Mul === undefined){
+
+
+  if(Mul === undefined){
   Mul = 1;
 }
 
@@ -123,15 +167,78 @@ if(highPool !== 0 && highPool >= highValue * Mul) {
 
 
 
-highPool = highPool - (highValue * Mul);//this was 1
-lowPool = lowPool + (lowValue * Mul);//this was 10 
-highFun(highPool);
-lowFun(lowPool);
+highFun((prevHigh: number) => {
+  if (prevHigh >= highValue * Mul!) {
+    lowFun((prevLow: number) => prevLow + lowValue * Mul!);
+    return prevHigh - highValue * Mul!;
+  }
+  return prevHigh;
+  //inside we have a fun running inside the useState
+  //it basically makes it so that we are getting updated version of the data when it changes
+  //all with doing the same math as before when cal-ing the coin diffrences 
+});
+
 }
 //console.log("pp:",highPool," ","gp:",lowPool);
 
 
 }
+
+
+const coin = (coinType:string, highPool:number, lowPool:number, highValue: number, lowValue: number, highFun:Function, lowFun:Function, conValue?: number, setBulk?:Function) => {
+  
+  
+  return(
+    <div className="character-form-container">
+       <button onMouseDown={() => holdDown(() => moneyDown(highPool,lowPool,highValue,lowValue,highFun,lowFun))}
+        onMouseLeave={stopHold}
+        onMouseUp={stopHold}
+        >money down</button>
+      <button onMouseDown={() => holdDown(() => moneyUp(highPool,lowPool,highValue,lowValue,highFun,lowFun)) }
+        onMouseLeave={stopHold}
+        onMouseUp={stopHold}
+        >money up</button>
+  
+  {conValue !== undefined && setBulk ?       
+  
+  <>
+    <button onMouseDown={() => holdDown(() => moneyDown(highPool,lowPool,highValue,lowValue,highFun,lowFun, conValue))}
+          onMouseLeave={stopHold}
+          onMouseUp={stopHold}
+          >money down bulk</button>
+        <button onMouseDown={() => holdDown(() => moneyUp(highPool,lowPool,highValue,lowValue,highFun,lowFun, conValue))}
+          onMouseLeave={stopHold}
+          onMouseUp={stopHold}
+          >money up bulk</button>
+    
+            <input
+              className="character-form-input"
+              type="number"
+              min="0"
+              value={conValue}
+              onChange={(e) => setBulk(Number(e.target.value))}
+              /> 
+  </>
+  : <p></p>}
+
+
+        <ul>{coinType}:
+        <input
+            className="character-form-input"
+            type="number"
+            min="0"
+            value={highPool}
+            onChange={(e) => highFun(Number(e.target.value))}
+            />
+        </ul>
+    </div>
+  )
+
+
+}
+
+
+
 
 type Dice = {
   damage_dice: number;
@@ -355,6 +462,14 @@ const [attack, setAttack] = useState<Attack[]>([]);
     setNotes([...notes, { title:'', value: ''}])
   }
 
+  const removeNotes = (attackIndex: number, dieIndex: number) => {
+  if(confirm("Are you sure? This will remove the feature from your sheet...")){
+  const updatedAttack = [...attack];
+  updatedAttack[attackIndex].dice.splice(dieIndex, 1); 
+  setAttack(updatedAttack);  
+  }
+};
+
   //we need to define stuff here so we can map it out later
   //we define index as a number, and we use key to get both title and value
   //using the UNION oprator to define both of them
@@ -506,105 +621,8 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
   };
   return (
     <div className="character-form-container">
-      <p>
-              {/*pp and gp*/}
-      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet)}>money down</button>
-      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet)}>money up</button>
 
-      
-      <button onClick={(e) => moneyDown(pp,gp,1,10,ppSet,gpSet, conPP)}>money down bulk</button>
-      <button onClick={(e) => moneyUp(pp,gp,1,10,ppSet,gpSet, conPP)}>money up bulk</button>
-
-          <input
-            className="character-form-input"
-            type="number"
-            value={conPP}
-            onChange={(e) => setConPP(Number(e.target.value))}
-            />
-
-        <ul>pp:
-        <input
-            className="character-form-input"
-            type="number"
-            value={pp}
-            onChange={(e) => ppSet(Number(e.target.value))}
-            />
-        </ul>
-                  {/*gp and ep*/}
-      <button onClick={(e) => moneyDown(gp,ep,1,2,gpSet,epSet)}>money down</button>
-      <button onClick={(e) => moneyUp(gp,ep,1,2,gpSet,epSet)}>money up</button>
-        
-      <button onClick={(e) => moneyDown(gp,ep,1,2,gpSet,epSet, conGP)}>money down bulk</button>
-      <button onClick={(e) => moneyUp(gp,ep,1,2,gpSet,epSet, conGP)}>money up bulk</button>
-
-          <input
-            className="character-form-input"
-            type="number"
-            value={conGP}
-            onChange={(e) => setConGP(Number(e.target.value))}
-            />
-
-        <ul>gp: 
-                  <input
-            className="character-form-input"
-            type="number"
-            value={gp}
-            onChange={(e) => gpSet(Number(e.target.value))}
-            />
-        </ul>
-
-                          {/*ep to sp*/}
-      <button onClick={(e) => moneyDown(ep,sp,1,5,epSet,spSet)}>money down</button>
-      <button onClick={(e) => moneyUp(ep,sp,1,5,epSet,spSet)}>money up</button>
-      
-      <button onClick={(e) => moneyDown(ep,sp,1,5,epSet,spSet, conEP)}>money down bulk</button>
-      <button onClick={(e) => moneyUp(ep,sp,1,5,epSet,spSet, conEP)}>money up bulk</button>
-
-          <input
-            className="character-form-input"
-            type="number"
-            value={conEP}
-            onChange={(e) => setConEP(Number(e.target.value))}
-            />
-      
-        <ul>ep: 
-                  <input
-            className="character-form-input"
-            type="number"
-            value={ep}
-            onChange={(e) => epSet(Number(e.target.value))}
-            />
-        </ul>
-                        {/*sp to cp*/}
-      <button onClick={(e) => moneyDown(sp,cp,1,10,spSet,cpSet)}>money down</button>
-      <button onClick={(e) => moneyUp(sp,cp,1,10,spSet,cpSet)}>money up</button>
-
-      <button onClick={(e) => moneyDown(sp,cp,1,10,spSet,cpSet, conSP)}>money down bulk</button>
-      <button onClick={(e) => moneyUp(sp,cp,1,10,spSet,cpSet, conSP)}>money up bulk</button>
-
-          <input
-            className="character-form-input"
-            type="number"
-            value={conSP}
-            onChange={(e) => setConSP(Number(e.target.value))}
-            /> 
-        
-        <ul>sp:         <input
-            className="character-form-input"
-            type="number"
-            value={sp}
-            onChange={(e) => spSet(Number(e.target.value))}
-            /></ul>
-                        {/*cp*/}
-     
-        <ul>cp:   <input
-            className="character-form-input"
-            type="number"
-            value={cp}
-            onChange={(e) => cpSet(Number(e.target.value))}
-            /></ul>
-      </p>
-      
+  
 
       
 
@@ -783,6 +801,25 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <p>Drag/Lift/Push: {trueDLP}</p>
       </div>
 
+          <p> Money
+              {/*pp and gp*/}
+     {coin("PP",pp,gp,1,10,ppSet,gpSet,conPP,setConPP)}
+              {/*gp and ep*/}
+     {coin("GP",gp,ep,1,2,gpSet,epSet,conGP,setConGP)}
+              {/*ep to sp*/}
+     {coin("EP",ep,sp,1,5,epSet,spSet,conEP,setConEP)}
+              {/*sp to cp*/}
+     {coin("SP",sp,cp,1,10,spSet,cpSet,conSP,setConSP)}        
+              {/*cp*/}
+        <ul>cp:   <input
+            className="character-form-input"
+            type="number"
+            min="0"
+            value={cp}
+            onChange={(e) => cpSet(Number(e.target.value))}
+            /></ul>
+      </p>
+      
 
       <div className="character-form-section">
         <label>
