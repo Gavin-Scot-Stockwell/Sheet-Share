@@ -67,7 +67,7 @@ const CharacterForm = () => {
   const [cp, cpSet] = useState(0)
   const [sp, spSet] = useState(0)
   const [ep, epSet] = useState(0)
-  const [gp, gpSet] = useState(0)
+  const [gp, gpSet] = useState(100)
   const [pp, ppSet] = useState(0)
 
   const [conPP,setConPP] = useState(0)
@@ -100,12 +100,6 @@ const weight = () => {
   return sum
 }
 
-//////////////////////
-
-
-
-
-
 const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 //setting up genetics to then be used for fun
 const holdDown = (fun: Function) => {
@@ -127,28 +121,23 @@ const stopHold = () => {
   }
 };
 
-
-
-
-
-///////////////
-
 const moneyUp = (highPool:number, lowPool:number, highValue:number, lowValue:number, highFun:Function, lowFun:Function, Mul?:number) => {
 if(Mul === undefined){
   Mul = 1;
 }
-
-if(lowPool !== 0 && lowPool >= lowValue * Mul) {
-highFun((prevHigh: number) => {
-  if (prevHigh >= highValue * Mul!) {
-    lowFun((prevLow: number) => prevLow - lowValue * Mul!);
-    return prevHigh + highValue * Mul!;
-  }
-  return prevHigh;
-
-});
+//this is done diff-ly due to 0 negative roll over happening when going too much up
+if(lowPool !== 0 && lowPool >= lowValue * Mul) {//check not current state
+  lowFun((currentLow: number) => {
+    if (currentLow >= lowValue * Mul!) {//checks current low with the mul factor
+      const newLow = currentLow - (lowValue * Mul!);//new low 
+      
+      highFun((currentHigh: number) => currentHigh + (highValue * Mul!));//gets current high
+      
+      return newLow;//returns new low
+    }
+    return currentLow;//returns current low
+  });
 }
-
 //console.log("pp:",highPool," ","gp:",lowPool);
 
 
