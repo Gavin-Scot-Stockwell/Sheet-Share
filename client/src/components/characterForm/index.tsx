@@ -451,24 +451,42 @@ const [attack, setAttack] = useState<Attack[]>([]);
     updatedItems[index][key] = value;
     setItems(updatedItems);
   };
+  
+  const removeItem = (index: number) => {
+  if (confirm("Are you sure? This will remove the item from your sheet...")) {
+    const updatedItems = [...items];
+    updatedItems.splice(index, 1);
+    setItems(updatedItems);
+  }
+};
 
     const addFeatureRow = () => {
     setFeatures([...features, { name: '', value: '' }]); 
   };
 
+  const removeFeature = (index: number) => {
+  if (confirm("Are you sure? This will remove the feature from your sheet...")) {
+    const updatedFeatures = [...features];
+    updatedFeatures.splice(index, 1);
+    setFeatures(updatedFeatures);
+  }
+};
   //adds new version of the row
   const addNoteRow = () => {
     //the ...notes will be made and the array agrs are fill blank as seen below
     setNotes([...notes, { title:'', value: ''}])
   }
 
-  const removeNotes = (attackIndex: number, dieIndex: number) => {
-  if(confirm("Are you sure? This will remove the feature from your sheet...")){
-  const updatedAttack = [...attack];
-  updatedAttack[attackIndex].dice.splice(dieIndex, 1); 
-  setAttack(updatedAttack);  
+const removeNotes = (index: number) => {
+  if (confirm("Are you sure? This will remove the notes from your sheet...")) {
+    const updatedNotes = [...notes];
+    updatedNotes.splice(index, 1);
+    setNotes(updatedNotes);
   }
 };
+
+
+
 
   //we need to define stuff here so we can map it out later
   //we define index as a number, and we use key to get both title and value
@@ -486,9 +504,10 @@ const [attack, setAttack] = useState<Attack[]>([]);
     const updatedFeature = [...features];
     updatedFeature[index][key] = value;
     setFeatures(updatedFeature);
-  
-
   };
+
+
+
 
 const addAttackRow = () => {
   setAttack([
@@ -523,6 +542,14 @@ const updateAttackRow = (
   updateAttack[index][key] = value;
   setAttack(updateAttack);
 }
+
+  const removeAttack = (index: number) => {
+  if (confirm("Are you sure? This will remove the attack or spell from your sheet...")) {
+    const updateAttack = [...attack];
+    updateAttack.splice(index, 1);
+    setAttack(updateAttack);
+  }
+};
 
 const addDie = (index: number) => {
   const updatedAttack = [...attack];
@@ -811,7 +838,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               {/*sp to cp*/}
      {coin("SP",sp,cp,1,10,spSet,cpSet,conSP,setConSP)}        
               {/*cp*/}
-        <ul>cp:   <input
+        <ul>CP:   <input
             className="character-form-input"
             type="number"
             min="0"
@@ -862,6 +889,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       onChange={(e)=> updateNoteRow(index, "value", e.target.value)}
       />
     </div>
+    <button onClick={()=>removeNotes(index)}>Remove Note /\</button>
     </div>
     )}
   </label>
@@ -871,6 +899,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
   <input
         style={{ width:"100px" }}
         className="character-form-input scrollable-container.attacks-section "
+        min="0"
         type="number"
         value={maxHp}
         onChange={ (e) => setMaxHp(Number(e.target.value))}
@@ -880,6 +909,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         style={{ width:"100px" }}
         className="character-form-input scrollable-container.attacks-section "
         type="number"
+        min="0"
         value={currentHp}
         onChange={ (e) => setCurrentHp(Number(e.target.value))}
   />
@@ -919,8 +949,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         {skills("Performance", perf, setPerf, CHA, perfE, setPerfE)}
         {skills("Persuasion", pers, setPers, CHA, persE, setPersE)}
       </div>
-
-      <h1 className="character-form-section-title">Saving Throw</h1>
+   <h1 className="character-form-section-title">Saving Throw</h1>
       <div className="character-form-saves">
         {save("Strength",STRsave,setSTRsave,STR)}
         {save("Dexterity",DEXsave,setDEXsave,DEX)}
@@ -952,6 +981,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                 placeholder={`Feature`}
               />
             </div>
+            <button onClick={() => removeFeature(index)}>Remove Feature</button>
           </div>
         ))}
       </div>
@@ -971,6 +1001,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
               marginBottom: "8px",
             }}
           >
+            <button onClick={()=>removeAttack(index)}>Remove Attack Or Spell</button>
             <input
               className="character-form-input"
               style={{ width:"auto" }}
@@ -1190,6 +1221,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
             />
           <p>{item.name} Weighs {item.weight*item.amount} lbs</p>
           <p>amount of {item.name}: {item.amount}</p>
+          <button onClick={() => removeItem(index)}>Remove {item.name}?</button>
           </div>
         ))} 
 
