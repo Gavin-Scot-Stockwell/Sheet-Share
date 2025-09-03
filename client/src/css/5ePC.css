@@ -152,3 +152,298 @@ label {
 .section + .section {
   margin-top: 20px;
 }
+
+/* Attack/Spell Row Container */
+.attack-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-rows: auto auto;
+  gap: 3px;
+  margin-bottom: 4px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 11px;
+  background-color: #f8f9fa;
+}
+
+/* Basic Inputs */
+.attack-name-input {
+  width: 100%;
+  max-width: 180px;
+  min-width: 100px;
+  padding: 2px 4px;
+  font-size: 11px;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 3px;
+}
+
+.attack-description {
+  width: 100%;
+  max-width: 280px;
+  min-width: 140px;
+  height: 50px;
+  resize: vertical;
+  padding: 2px 4px;
+  font-size: 11px;
+  background: #f3e5f5;
+  border: 1px solid #ce93d8;
+  border-radius: 3px;
+}
+
+/* Radio Toggle Buttons */
+.attack-toggle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: 1px solid;
+}
+
+.attack-toggle-hit {
+  background: #e8f5e8;
+  border-color: #a5d6a7;
+}
+
+.attack-toggle-save {
+  background: #fff3e0;
+  border-color: #ffb74d;
+}
+
+/* Hit / Save Blocks */
+.attack-hit-block {
+  padding: 3px;
+  background: #e8f5e8;
+  border: 1px solid #a5d6a7;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+.attack-save-block {
+  padding: 3px;
+  background: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+.attack-hit-text {
+  margin: 2px 0;
+  font-size: 10px;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.attack-save-text {
+  margin: 2px 0;
+  font-size: 10px;
+  color: #ef6c00;
+  font-weight: 600;
+}
+
+/* Selects / Small Inputs */
+.attack-small-select,
+.attack-small-input {
+  padding: 1px 2px;
+  font-size: 10px;
+  width: 60px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.attack-number-compact {
+  width: 60px;
+  padding: 1px 2px;
+  font-size: 10px;
+}
+
+/* Damage Dice Section */
+.attack-dice-container {
+  background: #fce4ec;
+  border: 1px solid #f8bbd9;
+  border-radius: 3px;
+  padding: 3px;
+  margin-top: 2px;
+  width: 100%;
+  min-width: 100px; /* adjust as needed */
+}
+
+.attack-dice-title {
+  font-size: 10px;
+  font-weight: bold;
+  color: #c2185b;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.attack-dice-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.attack-dice-select {
+  padding: 2px 4px;
+  font-size: 10px;
+  width: 55px;
+  border: 1px solid #c48b9f;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.attack-dice-amount {
+  width: 55px;
+  padding: 2px 4px;
+  font-size: 10px;
+  border: 1px solid #c48b9f;
+  border-radius: 3px;
+  background: #fff;
+}
+
+/* Buttons */
+.attack-remove-btn,
+.attack-die-remove-btn,
+.attack-roll-btn,
+.attack-add-die-btn {
+  padding: 2px 6px;
+  font-size: 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.attack-remove-btn {
+  background: #dc3545;
+}
+
+.attack-die-remove-btn {
+  background: #dc3545;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.attack-roll-btn {
+  background: #4caf50;
+  margin: 1px;
+}
+
+.attack-add-die-btn {
+  background: #2196f3;
+  margin: 1px;
+}
+
+.attack-roll-btn:hover { background:#449d48; }
+.attack-add-die-btn:hover { background:#1b7fc9; }
+.attack-remove-btn:hover,
+.attack-die-remove-btn:hover { background:#b92737; }
+
+/* Damage Total */
+.attack-damage-total {
+  margin-left: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #c2185b;
+}
+
+/* Ability / Bonus / Type Group */
+.attack-ability-group {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  margin-top: 2px;
+  padding: 2px;
+  background: #e1f5fe;
+  border: 1px solid #81d4fa;
+  border-radius: 3px;
+  font-size: 10px;
+  flex-wrap: wrap;
+}
+
+.attack-ability-label {
+  font-weight: bold;
+  color: #0277bd;
+  font-size: 10px;
+}
+
+.attack-ability-select {
+  padding: 1px 2px;
+  font-size: 10px;
+  width: 60px;
+  border: 1px solid #81d4fa;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.attack-bonus-input {
+  width: 50px;
+  padding: 1px 2px;
+  font-size: 10px;
+  border: 1px solid #81d4fa;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.attack-damage-type-select {
+  padding: 1px 2px;
+  font-size: 10px;
+  width: 80px;
+  border: 1px solid #81d4fa;
+  border-radius: 3px;
+  background: #fff;
+}
+
+/* Spell slot toggle */
+.attack-spell-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ede7f6;
+  border: 1px solid #b39ddb;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+.attack-spell-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+  color: #5e35b1;
+  font-size: 9px;
+}
+
+.attack-spell-slot-select {
+  padding: 1px 2px;
+  font-size: 9px;
+  width: 50px;
+  border: 1px solid #b39ddb;
+  border-radius: 3px;
+  background: #fff;
+}
+
+/* Utility */
+.attack-inline-flex {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.attack-bold {
+  font-weight: bold;
+}
+
+.attack-muted {
+  opacity: 0.7;
+  font-size: 10px;
+}

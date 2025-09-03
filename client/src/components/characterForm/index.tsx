@@ -248,6 +248,9 @@ type Attack = {
   pro: number;
   proButton : boolean;
   saveBonus: number;
+  description: string;
+  spellSlot:string;
+  isSpell:boolean;
 };
 
 const [attack, setAttack] = useState<Attack[]>([]);
@@ -474,9 +477,6 @@ const removeNotes = (index: number) => {
   }
 };
 
-
-
-
   //we need to define stuff here so we can map it out later
   //we define index as a number, and we use key to get both title and value
   //using the UNION oprator to define both of them
@@ -515,7 +515,9 @@ const addAttackRow = () => {
       pro: 0,
       proButton: true,
       saveBonus: 0,
-
+      description: '',
+      spellSlot: '',
+      isSpell: false,
     },
   ]);
 };
@@ -523,7 +525,9 @@ const addAttackRow = () => {
   //REVIEW
 const updateAttackRow = (
   index: number,
-  key: 'hitOrSave' | 'name' | 'hit' | 'save' | 'damage' | 'damage_type' | 'damageType' | 'abType' | 'sumDamage' | 'dice' | 'damage_dice' | 'die_amount' | 'pro' | 'proButton' | 'saveBonus',
+  key: 'hitOrSave' | 'name' | 'hit' | 'save' | 'damage' | 'damage_type' | 
+  'damageType' | 'abType' | 'sumDamage' | 'dice' | 'damage_dice' | 'die_amount' 
+  | 'pro' | 'proButton' | 'saveBonus' | 'description' | 'spellSlot' |'isSpell',
   value: string | number | boolean | number[]
 ) => {
   const updateAttack = [...attack];
@@ -561,76 +565,263 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
       // Create a new PDF document
       const pdfDoc = await PDFDocument.create();
 
-      // Add a page to the document
-      const page = pdfDoc.addPage([600, 400]);
+      // Add multiple pages for comprehensive character sheet
+      const page1 = pdfDoc.addPage([612, 792]); // Standard letter size
+      const page2 = pdfDoc.addPage([612, 792]);
 
       // Set font size and color
-      const fontSize = 12;
+      const fontSize = 10;
+      const titleSize = 14;
       const textColor = rgb(0, 0, 0);
 
-      // Add character name and description
-      page.drawText(`Character Name: ${characterName}`, { x: 50, y: 350, size: fontSize + 2, color: textColor });
-          page.drawText(`Level: ${playerLv}`, { x: 100, y: 350, size: fontSize + 2, color: textColor });
+      // PAGE 1 - Basic Character Info
+      let y = 750;
 
-      page.drawText(`Description: ${characterDescription}`, { x: 50, y: 330, size: fontSize, color: textColor });
-      //Add Ability Scores and Mod
-      page.drawText(`Ability Scores`, { x: 100, y: 200, size: fontSize, color: textColor });
-      page.drawText(`Strength Score: ${STR} Strength Modifier: ${mod(STR)}`, { x: 100, y: 180, size: fontSize, color: textColor });
-      page.drawText(`Dexterity Score: ${DEX} Dexterity Modifier: ${mod(DEX)}`, { x: 100, y: 160, size: fontSize, color: textColor });
-      page.drawText(`Constitution Score: ${CON} Constitution Modifier: ${mod(CON)}`, { x: 100, y: 140, size: fontSize, color: textColor });
-      page.drawText(`Intelligence Score: ${INT} Intelligence Modifier: ${mod(INT)}`, { x: 100, y: 120, size: fontSize, color: textColor });
-      page.drawText(`Wisdom Score: ${WIS} Wisdom Modifier: ${mod(WIS)}`, { x: 100, y: 100, size: fontSize, color: textColor });
-      page.drawText(`Charisma Score: ${CHA} Charisma Modifier: ${mod(CHA)}`, { x: 100, y: 80, size: fontSize, color: textColor });
-      // Add Skills section
-      page.drawText('Skills:', { x: 350, y: 350, size: fontSize + 2, color: textColor });
+      // Character Name and Basic Info
+      page1.drawText(`D&D 5e Character Sheet`, { x: 50, y, size: titleSize + 2, color: textColor });
+      y -= 30;
+      page1.drawText(`Character Name: ${characterName}`, { x: 50, y, size: titleSize, color: textColor });
+      page1.drawText(`Level: ${playerLv}`, { x: 300, y, size: titleSize, color: textColor });
+      y -= 20;
+      page1.drawText(`Species: ${race}`, { x: 50, y, size: fontSize, color: textColor });
+      page1.drawText(`Class: ${clazz}`, { x: 200, y, size: fontSize, color: textColor });
+      page1.drawText(`Size: ${size}`, { x: 350, y, size: fontSize, color: textColor });
+      y -= 30;
 
-      const skills = [
-        { name: 'Athletics', value: ath ? mod(STR) + pro(playerLv) : mod(STR) },
-        { name: 'Acrobatics', value: acro ? mod(DEX) + pro(playerLv) : mod(DEX) },
-        { name: 'Sleight of Hand', value: sleh ? mod(DEX) + pro(playerLv) : mod(DEX) },
-        { name: 'Stealth', value: ste ? mod(DEX) + pro(playerLv) : mod(DEX) },
-        { name: 'Arcana', value: arc ? mod(INT) + pro(playerLv) : mod(INT) },
-        { name: 'History', value: his ? mod(INT) + pro(playerLv) : mod(INT) },
-        { name: 'Investigation', value: inv ? mod(INT) + pro(playerLv) : mod(INT) },
-        { name: 'Nature', value: nat ? mod(INT) + pro(playerLv) : mod(INT) },
-        { name: 'Religion', value: rel ? mod(INT) + pro(playerLv) : mod(INT) },
-        { name: 'Animal Handling', value: ani ? mod(WIS) + pro(playerLv) : mod(WIS) },
-        { name: 'Insight', value: ins ? mod(WIS) + pro(playerLv) : mod(WIS) },
-        { name: 'Medicine', value: med ? mod(WIS) + pro(playerLv) : mod(WIS) },
-        { name: 'Perception', value: per ? mod(WIS) + pro(playerLv) : mod(WIS) },
-        { name: 'Survival', value: sur ? mod(WIS) + pro(playerLv) : mod(WIS) },
-        { name: 'Deception', value: dec ? mod(CHA) + pro(playerLv) : mod(CHA) },
-        { name: 'Intimidation', value: intim ? mod(CHA) + pro(playerLv) : mod(CHA) },
-        { name: 'Performance', value: perf ? mod(CHA) + pro(playerLv) : mod(CHA) },
-        { name: 'Persuasion', value: pers ? mod(CHA) + pro(playerLv) : mod(CHA) },
+      // Health
+      page1.drawText(`Health: ${currentHp}/${maxHp} HP`, { x: 50, y, size: fontSize, color: textColor });
+      page1.drawText(`AC: ${AC}`, { x: 200, y, size: fontSize, color: textColor });
+      page1.drawText(`Initiative: ${initiative}`, { x: 280, y, size: fontSize, color: textColor });
+      y -= 30;
+
+      // Speed
+      page1.drawText(`Speed: ${speed}ft`, { x: 50, y, size: fontSize, color: textColor });
+      if (swim > 0) page1.drawText(`Swim: ${swim}ft`, { x: 150, y, size: fontSize, color: textColor });
+      if (climb > 0) page1.drawText(`Climb: ${climb}ft`, { x: 220, y, size: fontSize, color: textColor });
+      if (fly > 0) page1.drawText(`Fly: ${fly}ft`, { x: 290, y, size: fontSize, color: textColor });
+      y -= 30;
+
+      // Money
+      page1.drawText(`Money:`, { x: 50, y, size: fontSize + 2, color: textColor });
+      y -= 15;
+      page1.drawText(`PP: ${pp}  GP: ${gp}  EP: ${ep}  SP: ${sp}  CP: ${cp}`, { x: 50, y, size: fontSize, color: textColor });
+      y -= 30;
+
+      // Ability Scores in two columns
+      page1.drawText(`Ability Scores`, { x: 50, y, size: fontSize + 2, color: textColor });
+      y -= 20;
+      
+      const abilities = [
+        { name: 'Strength', score: STR, mod: mod(STR) },
+        { name: 'Dexterity', score: DEX, mod: mod(DEX) },
+        { name: 'Constitution', score: CON, mod: mod(CON) },
+        { name: 'Intelligence', score: INT, mod: mod(INT) },
+        { name: 'Wisdom', score: WIS, mod: mod(WIS) },
+        { name: 'Charisma', score: CHA, mod: mod(CHA) }
       ];
 
-      let skillY = 330;
-      skills.forEach((skill) => {
-        page.drawText(`${skill.name}: ${skill.value >= 0 ? '+' : ''}${skill.value}`, {
-          x: 350,
-          y: skillY,
-          size: fontSize,
-          color: textColor,
-        });
-        skillY -= 15;
+      abilities.forEach((ability, index) => {
+        const x = index < 3 ? 50 : 250;
+        const currentY = y - (index % 3) * 20;
+        page1.drawText(`${ability.name}: ${ability.score} (${ability.mod >= 0 ? '+' : ''}${ability.mod})`, 
+          { x, y: currentY, size: fontSize, color: textColor });
       });
-      // Add items dynamically
-      let y = 310; // Start position for items
+      y -= 80;
+
+      // Saving Throws
+      page1.drawText(`Saving Throws`, { x: 50, y, size: fontSize + 2, color: textColor });
+      y -= 15;
+      const saves = [
+        { name: 'STR', proficient: STRsave, ability: STR },
+        { name: 'DEX', proficient: DEXsave, ability: DEX },
+        { name: 'CON', proficient: CONsave, ability: CON },
+        { name: 'INT', proficient: INTsave, ability: INT },
+        { name: 'WIS', proficient: WISsave, ability: WIS },
+        { name: 'CHA', proficient: CHAsave, ability: CHA }
+      ];
+
+      saves.forEach((save, index) => {
+        const value = save.proficient ? mod(save.ability) + pro(playerLv) : mod(save.ability);
+        const x = 50 + (index * 80);
+        page1.drawText(`${save.name}: ${value >= 0 ? '+' : ''}${value}${save.proficient ? '*' : ''}`, 
+          { x, y, size: fontSize, color: textColor });
+      });
+      y -= 30;
+
+      // Skills in multiple columns
+      page1.drawText(`Skills (* = proficient, ** = expertise)`, { x: 50, y, size: fontSize + 2, color: textColor });
+      y -= 15;
+
+      const skillsList = [
+        { name: 'Athletics', proficient: ath, expertise: athE, ability: STR },
+        { name: 'Acrobatics', proficient: acro, expertise: acroE, ability: DEX },
+        { name: 'Sleight of Hand', proficient: sleh, expertise: slehE, ability: DEX },
+        { name: 'Stealth', proficient: ste, expertise: steE, ability: DEX },
+        { name: 'Arcana', proficient: arc, expertise: arcE, ability: INT },
+        { name: 'History', proficient: his, expertise: hisE, ability: INT },
+        { name: 'Investigation', proficient: inv, expertise: invE, ability: INT },
+        { name: 'Nature', proficient: nat, expertise: natE, ability: INT },
+        { name: 'Religion', proficient: rel, expertise: relE, ability: INT },
+        { name: 'Animal Handling', proficient: ani, expertise: aniE, ability: WIS },
+        { name: 'Insight', proficient: ins, expertise: insE, ability: WIS },
+        { name: 'Medicine', proficient: med, expertise: medE, ability: WIS },
+        { name: 'Perception', proficient: per, expertise: perE, ability: WIS },
+        { name: 'Survival', proficient: sur, expertise: surE, ability: WIS },
+        { name: 'Deception', proficient: dec, expertise: decE, ability: CHA },
+        { name: 'Intimidation', proficient: intim, expertise: intimE, ability: CHA },
+        { name: 'Performance', proficient: perf, expertise: perfE, ability: CHA },
+        { name: 'Persuasion', proficient: pers, expertise: persE, ability: CHA }
+      ];
+
+      skillsList.forEach((skill, index) => {
+        let value = mod(skill.ability);
+        let marker = '';
+        
+        if (skill.expertise) {
+          value += pro(playerLv) * 2;
+          marker = '**';
+        } else if (skill.proficient) {
+          value += pro(playerLv);
+          marker = '*';
+        }
+
+        const column = Math.floor(index / 9);
+        const row = index % 9;
+        const x = 50 + (column * 200);
+        const currentY = y - (row * 15);
+        
+        page1.drawText(`${skill.name}: ${value >= 0 ? '+' : ''}${value}${marker}`, 
+          { x, y: currentY, size: fontSize, color: textColor });
+      });
+
+      // PAGE 2 - Equipment, Features, Notes, Attacks
+      let page2Y = 750;
+
+      // Equipment/Items
+      page2.drawText(`Equipment & Items`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+      page2Y -= 15;
+      
+      if (encumbered) {
+        const totalWeight = weight();
+        const maxWeight = trueCarry;
+        page2.drawText(`Carrying: ${totalWeight}/${maxWeight} lbs ${totalWeight > maxWeight ? '(ENCUMBERED!)' : ''}`, 
+          { x: 50, y: page2Y, size: fontSize, color: totalWeight > maxWeight ? rgb(1, 0, 0) : textColor });
+        page2Y -= 15;
+      }
+
       items.forEach((item, index) => {
-        page.drawText(`Item ${index + 1}: ${item}`, { x: 50, y, size: fontSize, color: textColor });
-        y -= 20; // Move down for the next item
+        if (page2Y < 50) return; // Don't overflow page
+        page2.drawText(`${item.name} (x${item.amount}) - ${item.weight * item.amount} lbs`, 
+          { x: 50, y: page2Y, size: fontSize, color: textColor });
+        page2Y -= 12;
+        if (item.description) {
+          page2.drawText(`  ${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}`, 
+            { x: 60, y: page2Y, size: fontSize - 1, color: textColor });
+          page2Y -= 12;
+        }
       });
+      page2Y -= 20;
+
+      // Features
+      if (features.length > 0 && page2Y > 100) {
+        page2.drawText(`Features & Traits`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+        page2Y -= 15;
+        
+        features.forEach((feature, index) => {
+          if (page2Y < 50) return;
+          page2.drawText(`${feature.name}`, { x: 50, y: page2Y, size: fontSize, color: textColor });
+          page2Y -= 12;
+          if (feature.value) {
+            const description = feature.value.substring(0, 80);
+            page2.drawText(`  ${description}${feature.value.length > 80 ? '...' : ''}`, 
+              { x: 60, y: page2Y, size: fontSize - 1, color: textColor });
+            page2Y -= 12;
+          }
+        });
+        page2Y -= 20;
+      }
+
+      // Attacks & Spells
+      if (attack.length > 0 && page2Y > 100) {
+        page2.drawText(`Attacks & Spells`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+        page2Y -= 15;
+        
+        attack.forEach((att, index) => {
+          if (page2Y < 50) return;
+          const hitBonus = att.hitOrSave ? 
+            att.hit + abMod[att.pro] + (att.proButton ? pro(playerLv) : 0) : 
+            null;
+          const saveBonus = !att.hitOrSave ? 
+            abMod[att.save] + 8 + pro(playerLv) + att.saveBonus : 
+            null;
+          
+          page2.drawText(`${att.name}`, { x: 50, y: page2Y, size: fontSize, color: textColor });
+          page2Y -= 12;
+          
+          if (hitBonus !== null) {
+            page2.drawText(`  To Hit: ${hitBonus >= 0 ? '+' : ''}${hitBonus}`, 
+              { x: 60, y: page2Y, size: fontSize - 1, color: textColor });
+          } else if (saveBonus !== null) {
+            page2.drawText(`  Save DC: ${saveBonus}`, 
+              { x: 60, y: page2Y, size: fontSize - 1, color: textColor });
+          }
+          
+          const diceText = att.dice.map(d => `${d.die_amount}d${d.damage_dice}`).join(' + ');
+          const damageBonus = att.damage + (att.abType < 6 ? abMod[att.abType] : 0);
+          page2.drawText(`  Damage: ${diceText} + ${damageBonus}`, 
+            { x: 200, y: page2Y, size: fontSize - 1, color: textColor });
+          page2Y -= 15;
+        });
+        page2Y -= 20;
+      }
+
+      // Notes
+      if (notes.length > 0 && page2Y > 100) {
+        page2.drawText(`Notes`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+        page2Y -= 15;
+        
+        notes.forEach((note) => {
+          if (page2Y < 50) return;
+          page2.drawText(`${note.title}`, { x: 50, y: page2Y, size: fontSize, color: textColor });
+          page2Y -= 12;
+          if (note.value) {
+            const noteText = note.value.substring(0, 80);
+            page2.drawText(`  ${noteText}${note.value.length > 80 ? '...' : ''}`, 
+              { x: 60, y: page2Y, size: fontSize - 1, color: textColor });
+            page2Y -= 12;
+          }
+        });
+      }
+
+      // Background and Description on remaining space
+      if (page2Y > 100) {
+        if (background) {
+          page2.drawText(`Background`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+          page2Y -= 15;
+          const bgText = background.substring(0, 200);
+          page2.drawText(`${bgText}${background.length > 200 ? '...' : ''}`, 
+            { x: 50, y: page2Y, size: fontSize, color: textColor });
+          page2Y -= 20;
+        }
+        
+        if (characterDescription) {
+          page2.drawText(`Description`, { x: 50, y: page2Y, size: fontSize + 2, color: textColor });
+          page2Y -= 15;
+          const descText = characterDescription.substring(0, 200);
+          page2.drawText(`${descText}${characterDescription.length > 200 ? '...' : ''}`, 
+            { x: 50, y: page2Y, size: fontSize, color: textColor });
+        }
+      }
 
       // Serialize the PDF document
-      //const pdfBytes = await pdfDoc.save();
+      const pdfBytes = await pdfDoc.save();
 
       // Trigger download
-      // const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      // const link = document.createElement('a');
-      // link.href = URL.createObjectURL(blob);
-      // link.download = 'CharacterSheet.pdf';
-      // link.click();
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${characterName || 'Character'}_Sheet.pdf`;
+      link.click();
     } catch (error) {
       console.error('Error creating PDF:', error);
     }
@@ -980,44 +1171,69 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <button className="character-form-button" onClick={addAttackRow}> Add Attack Or Spell</button>
         {attack.map((attack, index) =>
         (
-          <div
-            key={index}
-            className="character-form-attack-row"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              marginBottom: "8px",
-            }}
-          >
-            <button onClick={()=>removeAttack(index)}>Remove Attack Or Spell</button>
+          <div key={index} className="attack-row">
+            <button onClick={()=>removeAttack(index)} className="attack-remove-btn">Remove Attack Or Spell</button>
             <input
-              className="character-form-input"
-              style={{ width:"auto" }}
+              className="attack-name-input"
               value={attack.name}
               onChange={(e) => updateAttackRow(index, "name", e.target.value)}
-              placeholder="Attack Name"
+              placeholder="Attack/Spell Name"
             />
-            Hit?
-            <input
-              type="radio"
-              name={`hitOrSave-${index}`}
-              style={{ width: "60px" }}
-              value="value"
-              onChange={() => updateAttackRow(index, "hitOrSave", true)}
-            /> 
-            Save?
-            <input
-              type="radio"
-              name={`hitOrSave-${index}`}
-              style={{ width: "60px" }}
-              value="value"
-              onChange={() => updateAttackRow(index, "hitOrSave", false)}
-            /> 
+            <textarea
+              className="attack-description"
+              value={attack.description}
+              onChange={(e) => updateAttackRow(index, "description", e.target.value)}
+              placeholder="Description"
+            />
+            <div className="attack-spell-toggle-group">
+              <label className="attack-spell-toggle-label">
+                <input
+                  type="checkbox"
+                  checked={attack.isSpell}
+                  onChange={() => updateAttackRow(index, 'isSpell', !attack.isSpell)}
+                />
+                Spell Slot?
+              </label>
+              {attack.isSpell && (
+                <select
+                  className="attack-spell-slot-select"
+                  value={attack.spellSlot}
+                  onChange={(e) => updateAttackRow(index, 'spellSlot', e.target.value)}
+                >
+                  <option value="1">1st</option>
+                  <option value="2">2nd</option>
+                  <option value="3">3rd</option>
+                  <option value="4">4th</option>
+                  <option value="5">5th</option>
+                  <option value="6">6th</option>
+                  <option value="7">7th</option>
+                  <option value="8">8th</option>
+                  <option value="9">9th</option>
+                </select>
+              )}
+            </div>
+            <label className="attack-toggle attack-toggle-hit">
+              <input
+                type="radio"
+                name={`hitOrSave-${index}`}
+                value="value"
+                onChange={() => updateAttackRow(index, "hitOrSave", true)}
+              />
+              Hit?
+            </label>
+            <label className="attack-toggle attack-toggle-save">
+              <input
+                type="radio"
+                name={`hitOrSave-${index}`}
+                value="value"
+                onChange={() => updateAttackRow(index, "hitOrSave", false)}
+              />
+              Save?
+            </label> 
             {attack.hitOrSave ?             
-              <div> Hit
-              
-               <p>
+              <div className="attack-hit-block"> 
+                <span className="attack-hit-text">Hit</span>
+               <p style={{ margin: "2px 0", fontSize: "10px" }}>
                 Proficient
                 <input
                 type = "checkbox"
@@ -1025,12 +1241,10 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                 checked={attack.proButton}
                 onChange={() => updateAttackRow(index, "proButton", !attack.proButton)}
                 /></p>
-
                 <select id="hit"
-                  className="character-form-input"
+                  className="attack-small-select"
                   value={attack.pro}
-                  onChange={(e) => updateAttackRow(index, "pro", Number(e.target.value))}
-                >
+                  onChange={(e) => updateAttackRow(index, "pro", Number(e.target.value))}>
                   <option value={0}>STR</option>
                   <option value={1}>DEX</option>
                   <option value={2}>CON</option>
@@ -1038,24 +1252,23 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                   <option value={4}>WIS</option>
                   <option value={5}>CHA</option>
                 </select>
-
                 <input
                   type="number"
-                  className="character-form-input"
-                  style={{ width: "100px" }}
+                  className="attack-small-input"
                   value={attack.hit}
                   onChange={(e) => updateAttackRow(index, "hit", Number(e.target.value))}
-                  placeholder="Hit"
-                /> 
-                <p> Hit: {attack.hit + abMod[attack.pro] + (attack.proButton ? pro(playerLv) : 0)}</p>
+                  placeholder="Hit" /> 
+                <p className="attack-hit-text"> 
+                  Hit: {attack.hit + abMod[attack.pro] + (attack.proButton ? pro(playerLv) : 0)}
+                </p>
              
               </div>
-            : <div> Save
+            : <div className="attack-save-block"> 
+                <span className="attack-save-text">Save</span>
                 <select id="save"
-                  className="character-form-input"
+                  className="attack-small-select"
                   value={attack.save}
-                  onChange={(e) => updateAttackRow(index, "save", Number(e.target.value))}
-                >
+                  onChange={(e) => updateAttackRow(index, "save", Number(e.target.value))}>
                   <option value={0}>STR</option>
                   <option value={1}>DEX</option>
                   <option value={2}>CON</option>
@@ -1065,20 +1278,21 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
                 </select>
                 <input
                   type="number"
-                  className="character-form-input"
-                  style={{ width: "100px" }}
+                  className="attack-small-input"
                   value={attack.saveBonus}
                   onChange={(e) => updateAttackRow(index, "saveBonus", Number(e.target.value))}
-                  placeholder="Save Bonus"
-                /> 
-                <p>Save {abMod[attack.save]+8+pro(playerLv) + attack.saveBonus} {}</p>
+                  placeholder="Save Bonus" /> 
+                <p className="attack-save-text">
+                  Save {abMod[attack.save]+8+pro(playerLv) + attack.saveBonus}
+                </p>
               </div>
             }
-           <div className="scrollable-container">
+           <div className="attack-dice-container">
+             <span className="attack-dice-title">Damage Dice</span>
   {attack.dice.map((die, dieIndex) => (
-    <div key={dieIndex}>
+    <div key={dieIndex} className="attack-dice-row">
       <select
-        className="character-form-input"
+        className="attack-dice-select"
         value={die.damage_dice}
         onChange={(e) => {
           const updatedAttack = [attack];
@@ -1094,8 +1308,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         <option value={20}>d20</option>
       </select>
       <input
-        style={{ width:"100px" }}
-        className="character-form-input scrollable-container.attacks-section "
+        className="attack-dice-amount"
         type="number"
         value={die.die_amount}
         onChange={(e) => {
@@ -1105,7 +1318,7 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
         }}
       />
       <button
-        className="character-form-button"
+        className="attack-die-remove-btn"
         onClick={() =>removeDie(index, dieIndex)}
       >
         Remove Die
@@ -1114,58 +1327,58 @@ const removeDie = (attackIndex: number, dieIndex: number) => {
   ))}
 </div>
             <button
-              className="character-form-button"
+              className="attack-roll-btn"
               onClick={() =>{
                 const damage = rollDamage(attack.dice, attack.damage, abMod[attack.abType])
                 updateAttackRow(index, 'sumDamage', damage);
               }}
             >Roll Damage</button>
             <button 
-              className="character-form-button"
+              className="attack-add-die-btn"
               onClick ={() => addDie(index)}
             >Add Die
             </button>
-            <span style={{ marginLeft: '8px' }}> Damage
-              {attack.sumDamage > 0 && `Damage: ${attack.sumDamage}`}
+            <span className="attack-damage-total"> 
+              {attack.sumDamage > 0 && `Total Damage: ${attack.sumDamage}`}
             </span>
-            Ability 
-            <select id="abType" style={{width:"auto"}}
-              className="character-form-input"
-              value={attack.abType}
-              onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}
-            >
-              <option value={0}>STR</option>
-              <option value={1}>DEX</option>
-              <option value={2}>CON</option>
-              <option value={3}>INT</option>
-              <option value={4}>WIS</option>
-              <option value={5}>CHA</option>
-              <option value={6}>None</option>
-            </select>
-            Damage Bonus
-            <input id = "bonus"
-              className="character-form-input"
-              type="number"
-              style={{ width: "80px" }}
-              value={attack.damage}
-              onChange={(e) => updateAttackRow(index, "damage", Number(e.target.value))}
-            />
-            Damage Type
-            <select style={{width:"auto"}}id="damageType" className="character-form-input">
-              <option defaultValue="fire" >Fire</option>
-              <option value="cold" >Cold</option>
-              <option value="acid" >Acid</option>
-              <option value="lightning" >Lightning</option>
-              <option value="thunder">Thunder</option>
-              <option value="poison" >Poison</option>
-              <option value="slashing">Slashing</option>
-              <option value="piercing" >Piercing</option>
-              <option value="bludgeoning">Bludgeoning</option>
-              <option value="necrotic">Necrotic</option>
-              <option value="radiant">Radiant</option>
-              <option value="force">Force</option>
-              <option value="psychic">Psychic</option>
-            </select>     
+            {/* (Spell slot toggle moved earlier & styled) */}
+            <div className="attack-ability-group">
+              <span className="attack-ability-label">Ability:</span>
+              <select id="abType" 
+                className="attack-ability-select"
+                value={attack.abType}
+                onChange={(e) => updateAttackRow(index, "abType", Number(e.target.value))}>
+                <option value={0}>STR</option>
+                <option value={1}>DEX</option>
+                <option value={2}>CON</option>
+                <option value={3}>INT</option>
+                <option value={4}>WIS</option>
+                <option value={5}>CHA</option>
+                <option value={6}>None</option>
+              </select>
+              <span className="attack-ability-label">Bonus:</span>
+              <input id = "bonus"
+                className="attack-bonus-input"
+                type="number"
+                value={attack.damage}
+                onChange={(e) => updateAttackRow(index, "damage", Number(e.target.value))} />
+              <span className="attack-ability-label">Type:</span>
+              <select id="damageType" className="attack-damage-type-select">
+                <option defaultValue="fire" >Fire</option>
+                <option value="cold" >Cold</option>
+                <option value="acid" >Acid</option>
+                <option value="lightning" >Lightning</option>
+                <option value="thunder">Thunder</option>
+                <option value="poison" >Poison</option>
+                <option value="slashing">Slashing</option>
+                <option value="piercing" >Piercing</option>
+                <option value="bludgeoning">Bludgeoning</option>
+                <option value="necrotic">Necrotic</option>
+                <option value="radiant">Radiant</option>
+                <option value="force">Force</option>
+                <option value="psychic">Psychic</option>
+              </select>     
+            </div>
           </div>
         ))}
       </div>
